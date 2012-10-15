@@ -1,0 +1,8 @@
+<config>
+    <modules>
+        <BillysBilling_Invoicer>
+            <active>true</active>
+            <codePool>local</codePool>
+        </BillysBilling_Invoicer>
+    </modules>
+</config>
