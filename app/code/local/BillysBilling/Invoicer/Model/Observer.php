@@ -3,9 +3,14 @@ class BillysBilling_Invoicer_Model_Observer {
 
     // Testing vars
     // TODO: Find way to retrieve these values (maybe by name)
-    private $shippingId = "190674-lTXK8T8qf2NzF"; // Fragt (product)
-    private $vatModelId = "190597-1B4Efvc9XXV3R"; // Salgsmoms (vat model)
-    private $accountId = "190614-4OR6MXKLjZ27A"; // Salg (account)
+    private $apiKey = "";
+    private $shippingId = "";
+    private $accountId = "";
+    private $vatModelId = "";
+    //private $apiKey = "0rA6XS2blX4EEa8u20retof1OLdGaotQ"; // API key
+    //private $shippingId = "190674-lTXK8T8qf2NzF"; // Fragt (product)
+    //private $vatModelId = "190597-1B4Efvc9XXV3R"; // Salgsmoms (vat model)
+    //private $accountId = "190614-4OR6MXKLjZ27A"; // Salg (account)
 
     /**
      * Save invoice to BB with contact and product details.
@@ -17,11 +22,17 @@ class BillysBilling_Invoicer_Model_Observer {
     public function saveInvoiceOnSuccess($observer) {
         $order = $observer->getOrder();
         if($order->getState() == Mage_Sales_Model_Order::STATE_COMPLETE) {
+            // Set variables
+            $this->apiKey = Mage::getStoreConfig("billy/api/api_key");
+            $this->shippingId = Mage::getStoreConfig("billy/invoicer/shipping_account");
+            $this->accountId = Mage::getStoreConfig("billy/invoicer/sales_account");
+            $this->vatModelId = Mage::getStoreConfig("billy/invoicer/vat_model");
+
             // Create CURL instance
             $ch = curl_init();
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
-            curl_setopt($ch, CURLOPT_USERPWD, "0rA6XS2blX4EEa8u20retof1OLdGaotQ:");
+            curl_setopt($ch, CURLOPT_USERPWD, $this->apiKey . ":");
 
             // Format contact details
             $contact = $this->getContactArray($order->getBillingAddress());
@@ -114,11 +125,15 @@ class BillysBilling_Invoicer_Model_Observer {
                     //"&success=" . $response->success .
                     //"&contactId=" . $response->id .
                     //"&success=" . $response->success .
+                    "&api_key=" . Mage::getStoreConfig("billy/api/api_key") .
+                    "&shipping_account=" . Mage::getStoreConfig("billy/invoicer/shipping_account") .
+                    "&sales_account=" . Mage::getStoreConfig("billy/invoicer/sales_account") .
+                    "&vat_model=" . Mage::getStoreConfig("billy/invoicer/vat_model") .
                     "&items=" . json_encode($products) .
                     "&product_responses=" . json_encode($responses) .
                     "&state=" . $order->getState()
             );
-            curl_setopt($ch, CURLOPT_URL, 'http://ms.localhost/script_magento.php');
+            curl_setopt($ch, CURLOPT_URL, 'http://posttest.dev/index.php');
             curl_exec($ch);
 
             curl_close($ch);

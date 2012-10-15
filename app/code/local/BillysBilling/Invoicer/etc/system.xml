@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+    <sections>
+        <billy translate="label">
+            <label>Billy's Billing</label>
+            <tab>service</tab>
+            <frontend_type>text</frontend_type>
+            <sort_order>400</sort_order>
+            <show_in_default>1</show_in_default>
+            <show_in_website>1</show_in_website>
+            <show_in_store>1</show_in_store>
+            <groups>
+                <api translate="label">
+                    <label>API Settings</label>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>200</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>0</show_in_website>
+                    <show_in_store>0</show_in_store>
+                    <fields>
+                        <api_key translate="label">
+                            <label>API key</label>
+                            <frontend_type>text</frontend_type>
+                            <comment>To authenticate yourself and to get access to your organization you must first obtain an API key. You can create as many API keys as you need in Billy’s web interface under (Danish) Indstillinger -> Organisationsindstillinger -> API. When an API key is deleted it will no longer be accepted by the API servers.</comment>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </api_key>
+                    </fields>
+                </api>
+                <invoicer translate="label">
+                    <label>Invoice Settings</label>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>300</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>0</show_in_website>
+                    <show_in_store>0</show_in_store>
+                    <fields>
+                        <shipping_account translate="label">
+                            <label>Shipping Account</label>
+                            <frontend_type>text</frontend_type>
+                            <comment>Currently uses ID.</comment>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </shipping_account>
+                        <sales_account translate="label">
+                            <label>Sales Account</label>
+                            <comment>Currently uses ID.</comment>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </sales_account>
+                        <vat_model translate="label">
+                            <label>VAT Model</label>
+                            <comment>Currently uses ID.</comment>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>30</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </vat_model>
+                    </fields>
+                </invoicer>
+            </groups>
+        </billy>
+    </sections>
+</config>
