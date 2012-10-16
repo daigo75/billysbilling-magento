@@ -23,6 +23,16 @@
                 </observers>
             </sales_model_service_quote_submit_success>
         </events>
+        <models>
+            <billysbilling>
+                <class>BillysBilling_Invoicer_Model</class>
+            </billysbilling>
+        </models>
+        <helpers>
+            <billysbilling>
+                <class>BillysBilling_Invoicer_Helper</class>
+            </billysbilling>
+        </helpers>
     </global>
     <adminhtml>
         <acl>
