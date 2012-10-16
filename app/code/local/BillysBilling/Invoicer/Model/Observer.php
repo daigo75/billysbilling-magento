@@ -1,7 +1,6 @@
 <?php
 class BillysBilling_Invoicer_Model_Observer {
 
-    // Testing vars
     private $apiKey = "";
     private $shippingId = "";
     private $accountId = "";
@@ -89,8 +88,7 @@ class BillysBilling_Invoicer_Model_Observer {
             );
 
             // Current date
-            // TODO: Get from order details
-            $date = date("Y-m-d");
+            $date = date("Y-m-d", $order->getCreatedAtDate()->getTimestamp());
 
             // Format invoice details
             $invoice = array(
@@ -103,32 +101,23 @@ class BillysBilling_Invoicer_Model_Observer {
                 "state" => "approved",
                 "lines" => $products
             );
+
+            // Send debug to local script
+            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+            curl_setopt($ch, CURLOPT_POSTFIELDS, "invoice_post=" . json_encode($invoice));
+            curl_setopt($ch, CURLOPT_URL, 'http://posttest.dev/index.php');
+            curl_exec($ch);
+
             // Create new invoice
             curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
             curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($invoice));
             curl_setopt($ch, CURLOPT_URL, "https://api.billysbilling.dk/v1/invoices");
-            $response = json_decode(curl_exec($ch));
+            $rawResponse = curl_exec($ch);
+            //$response = json_decode($rawResponse);
 
             // Send debug to local script
             curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
-            curl_setopt($ch, CURLOPT_POSTFIELDS,
-                "contact=" . json_encode($contact) .
-                    //"&contact_response=" . $contactResponse .
-                    "&invoice_post=" . json_encode($invoice) .
-                    "&invoice_response=" . json_encode($response) .
-                    "&order_date=" . $order->getCreatedAtDate()->getTimestamp() .
-                    //"&id=" . $response->id .
-                    //"&success=" . $response->success .
-                    //"&contactId=" . $response->id .
-                    //"&success=" . $response->success .
-                    //"&api_key=" . Mage::getStoreConfig("billy/api/api_key") .
-                    //"&shipping_account=" . Mage::getStoreConfig("billy/invoicer/shipping_account") .
-                    //"&sales_account=" . Mage::getStoreConfig("billy/invoicer/sales_account") .
-                    //"&vat_model=" . Mage::getStoreConfig("billy/invoicer/vat_model") .
-                    //"&items=" . json_encode($products) .
-                    //"&product_responses=" . json_encode($responses) .
-                    "&state=" . $order->getState()
-            );
+            curl_setopt($ch, CURLOPT_POSTFIELDS, "invoice_response=" . $rawResponse . "&state=" . $order->getState());
             curl_setopt($ch, CURLOPT_URL, 'http://posttest.dev/index.php');
             curl_exec($ch);
 
