@@ -5,10 +5,8 @@ class BillysBilling_Invoicer_Model_Observer {
     private $shippingId = "";
     private $accountId = "";
     private $vatModelId = "";
-    //private $apiKey = "0rA6XS2blX4EEa8u20retof1OLdGaotQ"; // API key
-    //private $shippingId = "190674-lTXK8T8qf2NzF"; // Fragt (product)
-    //private $vatModelId = "190597-1B4Efvc9XXV3R"; // Salgsmoms (vat model)
-    //private $accountId = "190614-4OR6MXKLjZ27A"; // Salg (account)
+
+    private $client;
 
     /**
      * Save invoice to BB with contact and product details.
@@ -20,58 +18,27 @@ class BillysBilling_Invoicer_Model_Observer {
     public function saveInvoiceOnSuccess($observer) {
         $order = $observer->getOrder();
         if($order->getState() == Mage_Sales_Model_Order::STATE_COMPLETE) {
+            // Include Billy's PHP SDK
+            require(dirname(__FILE__) . "/billysbilling-php/bootstrap.php");
+
             // Set variables
             $this->apiKey = Mage::getStoreConfig("billy/api/api_key");
             $this->shippingId = Mage::getStoreConfig("billy/invoicer/shipping_account");
             $this->accountId = Mage::getStoreConfig("billy/invoicer/sales_account");
             $this->vatModelId = Mage::getStoreConfig("billy/invoicer/vat_model");
 
-            // Create CURL instance
-            $ch = curl_init();
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
-            curl_setopt($ch, CURLOPT_USERPWD, $this->apiKey . ":");
+            // Create new client with API key
+            $this->client = new Billy_Client($this->apiKey);
 
-            // Format contact details
-            $contact = $this->getContactArray($order->getBillingAddress());
-            // Check for existing contact
-            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "GET");
-            curl_setopt($ch, CURLOPT_URL, "https://api.billysbilling.dk/v1/contacts?q=" . urlencode($contact['name']));
-            $response = json_decode(curl_exec($ch));
-            if (count($response->contacts) > 0) {
-                // If existing contact, then save ID
-                $contactId = $response->contacts[0]->id;
-            } else {
-                // Create new contact and contact person, then save ID
-                curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
-                curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($contact));
-                curl_setopt($ch, CURLOPT_URL, "https://api.billysbilling.dk/v1/contacts");
-                $response = json_decode(curl_exec($ch));
-                $contactId = $response->id;
-            }
+            // Get contact ID
+            $contactId = $this->insertIgnore("contacts", $order->getBillingAddress());
 
             // Run through each order item
             $items = $order->getItemsCollection(array(), true);
             $products = array();
-            $responses = array(); // debug
             foreach ($items as $item) {
-                // Format product details
-                $product = $this->getProductArray($item);
-                // Check for existing product
-                curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "GET");
-                curl_setopt($ch, CURLOPT_URL, "https://api.billysbilling.dk/v1/products?q=" . urlencode($product['name']));
-                $response = json_decode(curl_exec($ch));
-                if (count($response->products) > 0) {
-                    // If existing product, then save ID
-                    $productId = $response->products[0]->id;
-                } else {
-                    // Create new product, then save ID
-                    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
-                    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($product));
-                    curl_setopt($ch, CURLOPT_URL, "https://api.billysbilling.dk/v1/products");
-                    $response = json_decode(curl_exec($ch));
-                    $productId = $response->id;
-                }
+                // Get product ID
+                $productId = $this->insertIgnore("products", $item);
 
                 // Add item to product array
                 $products[] = array(
@@ -87,7 +54,7 @@ class BillysBilling_Invoicer_Model_Observer {
                 "unitPrice" => $order->getShippingAmount()
             );
 
-            // Current date
+            // Order date
             $date = date("Y-m-d", $order->getCreatedAtDate()->getTimestamp());
 
             // Format invoice details
@@ -97,88 +64,101 @@ class BillysBilling_Invoicer_Model_Observer {
                 "entryDate" => $date,
                 "dueDate" => $date,
                 "currencyId" => Mage::app()->getStore()->getCurrentCurrencyCode(),
-                "exchangeRate" => 5.7785,
                 "state" => "approved",
                 "lines" => $products
             );
 
-            // Send debug to local script
-            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
-            curl_setopt($ch, CURLOPT_POSTFIELDS, "invoice_post=" . json_encode($invoice));
-            curl_setopt($ch, CURLOPT_URL, 'http://posttest.dev/index.php');
-            curl_exec($ch);
-
             // Create new invoice
-            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
-            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($invoice));
-            curl_setopt($ch, CURLOPT_URL, "https://api.billysbilling.dk/v1/invoices");
-            $rawResponse = curl_exec($ch);
-            //$response = json_decode($rawResponse);
+            $response = $this->client->post("invoices", $invoice);
 
             // Send debug to local script
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
-            curl_setopt($ch, CURLOPT_POSTFIELDS, "invoice_response=" . $rawResponse . "&state=" . $order->getState());
+            curl_setopt($ch, CURLOPT_POSTFIELDS, "invoice_response=" . json_encode($response) . "&state=" . $order->getState() . "&invoice_data=" . json_encode($invoice));
             curl_setopt($ch, CURLOPT_URL, 'http://posttest.dev/index.php');
             curl_exec($ch);
-
             curl_close($ch);
         }
     }
 
     /**
-     * Take an Address object from Magento and convert it into something usable by BB API.
+     * Take a data object from Magento, use it to either search for existing entries in BB and return ID of that, or
+     * insert a new entry in BB and return ID of that.
      *
-     * @param $contact Address object
-     * @return array of contact details with contact person
+     * @param $type string "contacts" or "products"
+     * @param $data BillingAddress object or Item object
+     *
+     * @return int ID of inserted or found entry
      */
-    private function getContactArray($contact) {
-        // Set name depending on company or not
-        if ($contact->getCompany()) {
-            $name = $contact->getCompany();
-        } else {
-            $name = $contact->getName();
-        }
+    private function insertIgnore($type, $data) {
+        // Format data
+        $data = $this->formatArray($type, $data);
 
-        return array(
-            'name' => $name,
-            'street' => $contact->getStreetFull(),
-            'zipcode' => $contact->getPostcode(),
-            'city' => $contact->getCity(),
-            'countryId' => $contact->getCountry_id(),
-            'state' => $contact->getRegion(),
-            'phone' => $contact->getTelephone(),
-            'fax' => $contact->getFax(),
-            'persons' => array(
-                array(
-                    'name' => $contact->getName(),
-                    'email' => $contact->getEmail(),
-                    'phone' => $contact->getTelephone()
-                )
-            )
-        );
+        // Check for existing contact
+        $response = $this->client->get($type . "?q=" . urlencode($data['name']));
+        $responseArray = $response->$type;
+        if (count($responseArray) > 0) {
+            // If existing contact, then save ID
+            $id = $responseArray[0]->id;
+        } else {
+            // Create new contact and contact person, then save ID
+            $response = $this->client->post($type, $data);
+            $id = $response->id;
+        }
+        return $id;
     }
 
     /**
-     * Take an Item object from Magento and convert it to something usable by BB API.
+     * Take a data object from Magento and convert it into something usable by BB API.
      *
-     * @param $item Item object
-     * @return array of product details
+     * @param $type string "contacts" or "products"
+     * @param $data BillingAddress object or Item object
+     * @return array of either contact or product
      */
-    private function getProductArray($item) {
-        return array(
-            "name" => $item->getName(),
-            "accountId" => $this->accountId,
-            "vatModelId" => $this->vatModelId,
-            "productType" => "product",
-            "productNo" => $item->product_id,
-            "suppliersProductNo" => $item->sku,
-            "prices" => array(
-                array(
-                    "currencyId" => Mage::app()->getStore()->getCurrentCurrencyCode(),
-                    "unitPrice" => $item->getPrice()
+    private function formatArray($type, $data) {
+        if ($type == "contacts") {
+            // Set name depending on company or not
+            if ($data->getCompany()) {
+                $name = $data->getCompany();
+            } else {
+                $name = $data->getName();
+            }
+
+            return array(
+                'name' => $name,
+                'street' => $data->getStreetFull(),
+                'zipcode' => $data->getPostcode(),
+                'city' => $data->getCity(),
+                'countryId' => $data->getCountry_id(),
+                'state' => $data->getRegion(),
+                'phone' => $data->getTelephone(),
+                'fax' => $data->getFax(),
+                'persons' => array(
+                    array(
+                        'name' => $data->getName(),
+                        'email' => $data->getEmail(),
+                        'phone' => $data->getTelephone()
+                    )
                 )
-            )
-        );
+            );
+        } else if ($type == "products") {
+            return array(
+                "name" => $data->getName(),
+                "accountId" => $this->accountId,
+                "vatModelId" => $this->vatModelId,
+                "productType" => "product",
+                "productNo" => $data->product_id,
+                "suppliersProductNo" => $data->sku,
+                "prices" => array(
+                    array(
+                        "currencyId" => Mage::app()->getStore()->getCurrentCurrencyCode(),
+                        "unitPrice" => $data->getPrice()
+                    )
+                )
+            );
+        }
+        return null;
     }
 
     /**
