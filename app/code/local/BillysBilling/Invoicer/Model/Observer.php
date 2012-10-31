@@ -17,69 +17,56 @@ class BillysBilling_Invoicer_Model_Observer {
      */
     public function saveInvoiceOnSuccess($observer) {
         $order = $observer->getOrder();
-        if($order->getState() == Mage_Sales_Model_Order::STATE_COMPLETE) {
-            // Include Billy's PHP SDK
-            require(dirname(__FILE__) . "/billysbilling-php/bootstrap.php");
 
-            // Set variables
-            $this->apiKey = Mage::getStoreConfig("billy/api/api_key");
-            $this->shippingId = Mage::getStoreConfig("billy/invoicer/shipping_account");
-            $this->accountId = Mage::getStoreConfig("billy/invoicer/sales_account");
-            $this->vatModelId = Mage::getStoreConfig("billy/invoicer/vat_model");
+        // Include Billy's PHP SDK
+        require(dirname(__FILE__) . "/billysbilling-php/bootstrap.php");
 
-            // Create new client with API key
-            $this->client = new Billy_Client($this->apiKey);
+        // Set variables
+        $this->apiKey = Mage::getStoreConfig("billy/api/api_key");
+        $this->shippingId = Mage::getStoreConfig("billy/invoicer/shipping_account");
+        $this->accountId = Mage::getStoreConfig("billy/invoicer/sales_account");
+        $this->vatModelId = Mage::getStoreConfig("billy/invoicer/vat_model");
 
-            // Get contact ID
-            $contactId = $this->insertIgnore("contacts", $order->getBillingAddress());
+        // Create new client with API key
+        $this->client = new Billy_Client($this->apiKey);
 
-            // Run through each order item
-            $items = $order->getItemsCollection(array(), true);
-            $products = array();
-            foreach ($items as $item) {
-                // Get product ID
-                $productId = $this->insertIgnore("products", $item);
+        // Get contact ID
+        $contactId = $this->insertIgnore("contacts", $order->getBillingAddress());
 
-                // Add item to product array
-                $products[] = array(
-                    "productId" => $productId,
-                    "quantity" => $item->getQtyShipped(),
-                    "unitPrice" => $item->getPrice()
-                );
-            }
-            // Add shipping costs to product array
+        // Run through each order item
+        $items = $order->getItemsCollection(array(), true);
+        $products = array();
+        foreach ($items as $item) {
+            // Get product ID
+            $productId = $this->insertIgnore("products", $item);
+
+            // Add item to product array
             $products[] = array(
-                "productId" => $this->shippingId,
-                "quantity" => 1,
-                "unitPrice" => $order->getShippingAmount()
+                "productId" => $productId,
+                "quantity" => $item->getQtyInvoiced(),
+                "unitPrice" => $item->getPrice()
             );
-
-            // Order date
-            $date = date("Y-m-d", $order->getCreatedAtDate()->getTimestamp());
-
-            // Format invoice details
-            $invoice = array(
-                "type" => "invoice",
-                "contactId" => $contactId,
-                "entryDate" => $date,
-                "dueDate" => $date,
-                "currencyId" => Mage::app()->getStore()->getCurrentCurrencyCode(),
-                "state" => "approved",
-                "lines" => $products
-            );
-
-            // Create new invoice
-            $response = $this->client->post("invoices", $invoice);
-
-            // Send debug to local script
-            $ch = curl_init();
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
-            curl_setopt($ch, CURLOPT_POSTFIELDS, "invoice_response=" . json_encode($response) . "&state=" . $order->getState() . "&invoice_data=" . json_encode($invoice));
-            curl_setopt($ch, CURLOPT_URL, 'http://posttest.dev/index.php');
-            curl_exec($ch);
-            curl_close($ch);
         }
+        // Add shipping costs to product array
+        $products[] = array(
+            "productId" => $this->shippingId,
+            "quantity" => 1,
+            "unitPrice" => $order->getShippingAmount()
+        );
+
+        // Order date
+        $date = date("Y-m-d", $order->getCreatedAtDate()->getTimestamp());
+
+        // Create new invoice
+        $response = $this->client->post("invoices", array(
+            "type" => "invoice",
+            "contactId" => $contactId,
+            "entryDate" => $date,
+            "dueDate" => $date,
+            "currencyId" => Mage::app()->getStore()->getCurrentCurrencyCode(),
+            "state" => "approved",
+            "lines" => $products
+        ));
     }
 
     /**
@@ -159,55 +146,5 @@ class BillysBilling_Invoicer_Model_Observer {
             );
         }
         return null;
-    }
-
-    /**
-     * Mage::dispatchEvent($this->_eventPrefix.'_save_after', $this->_getEventData());
-     * protected $_eventPrefix = 'sales_order';
-     * protected $_eventObject = 'order';
-     * event: sales_order_save_after
-     */
-    public function automaticallyInvoiceShipCompleteOrder($observer) {
-        $order = $observer->getEvent()->getOrder();
-        $orders = Mage::getModel('sales/order_invoice')->getCollection()
-            ->addAttributeToFilter('order_id', array('eq'=>$order->getId()));
-        $orders->getSelect()->limit(1);
-        if ((int)$orders->count() !== 0) {
-            return $this;
-        }
-        if ($order->getState() == Mage_Sales_Model_Order::STATE_NEW) {
-            try {
-                if(!$order->canInvoice()) {
-                    $order->addStatusHistoryComment('Inchoo_Invoicer: Order cannot be invoiced.', false);
-                    $order->save();
-                }
-                //START Handle Invoice
-                $invoice = Mage::getModel('sales/service_order', $order)->prepareInvoice();
-                $invoice->setRequestedCaptureCase(Mage_Sales_Model_Order_Invoice::CAPTURE_OFFLINE);
-                $invoice->register();
-                $invoice->getOrder()->setCustomerNoteNotify(false);
-                $invoice->getOrder()->setIsInProcess(true);
-                $order->addStatusHistoryComment('Automatically INVOICED by Inchoo_Invoicer.', false);
-                $transactionSave = Mage::getModel('core/resource_transaction')
-                    ->addObject($invoice)
-                    ->addObject($invoice->getOrder());
-                $transactionSave->save();
-                //END Handle Invoice
-                //START Handle Shipment
-                $shipment = $order->prepareShipment();
-                $shipment->register();
-                $order->setIsInProcess(true);
-                $order->addStatusHistoryComment('Automatically SHIPPED by Inchoo_Invoicer.', false);
-                $transactionSave = Mage::getModel('core/resource_transaction')
-                    ->addObject($shipment)
-                    ->addObject($shipment->getOrder())
-                    ->save();
-                //END Handle Shipment
-            } catch (Exception $e) {
-                $order->addStatusHistoryComment('Inchoo_Invoicer: Exception occurred during automaticallyInvoiceShipCompleteOrder action. Exception message: '.$e->getMessage(), false);
-                $order->save();
-            }
-        }
-        return $this;
     }
 }

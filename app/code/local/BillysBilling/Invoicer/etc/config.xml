@@ -6,22 +6,14 @@
     </modules>
     <global>
         <events>
-            <sales_order_save_after>
-                <observers>
-                    <billysbilling_invoicer_automatically_complete_order>
-                        <class>BillysBilling_Invoicer_Model_Observer</class>
-                        <method>automaticallyInvoiceShipCompleteOrder</method>
-                    </billysbilling_invoicer_automatically_complete_order>
-                </observers>
-            </sales_order_save_after>
-            <sales_model_service_quote_submit_success>
+            <sales_order_invoice_register>
                 <observers>
                     <billysbilling_save_invoice_on_success>
                         <class>BillysBilling_Invoicer_Model_Observer</class>
                         <method>saveInvoiceOnSuccess</method>
                     </billysbilling_save_invoice_on_success>
                 </observers>
-            </sales_model_service_quote_submit_success>
+            </sales_order_invoice_register>
         </events>
         <models>
             <billysbilling>
