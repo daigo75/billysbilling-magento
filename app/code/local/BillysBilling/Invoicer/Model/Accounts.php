@@ -2,16 +2,16 @@
 class BillysBilling_Invoicer_Model_Accounts {
     public function toOptionArray() {
         if (strlen(Mage::getStoreConfig("billy/api/api_key")) > 10) {
-            // Create CURL instance
-            $ch = curl_init();
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
-            curl_setopt($ch, CURLOPT_USERPWD, Mage::getStoreConfig("billy/api/api_key") . ":");
+            // Include Billy's PHP SDK
+            if (!class_exists('Billy_Client')) {
+                require(dirname(__FILE__) . "/billysbilling-php/bootstrap.php");
+            }
+
+            // Create new client with API key
+            $client = new Billy_Client(Mage::getStoreConfig("billy/api/api_key"));
 
             // Get all accounts
-            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "GET");
-            curl_setopt($ch, CURLOPT_URL, "https://api.billysbilling.dk/v1/accounts");
-            $response = json_decode(curl_exec($ch));
+            $response = $client->get("accounts");
 
             // Map accounts to account types and sort account types
             $results = array();
@@ -36,7 +36,10 @@ class BillysBilling_Invoicer_Model_Accounts {
             return $options;
         } else {
             return array(
-                array('value'=>'', 'label'=>'Please enter API key above and Save Config')
+                array(
+                    "value" => "",
+                    "label" => "Please enter API key above and Save Config"
+                )
             );
         }
     }
