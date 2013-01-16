@@ -59,7 +59,8 @@ mage
 php.ini.sample
 
 # Ignore subfolders
-app/code/community/*
+app/code/community/Phoenix/*
+app/code/local/*
 app/code/core/*
 app/design/*
 app/locale/*

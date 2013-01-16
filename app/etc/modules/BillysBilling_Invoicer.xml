@@ -2,7 +2,7 @@
     <modules>
         <BillysBilling_Invoicer>
             <active>true</active>
-            <codePool>local</codePool>
+            <codePool>community</codePool>
         </BillysBilling_Invoicer>
     </modules>
 </config>
