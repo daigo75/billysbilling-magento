@@ -10,7 +10,7 @@ Please read [API Terms](https://dev.billysbilling.dk/api-terms) before use.
 Download code and move the files/folders to positions inside Magento corresponding to the current folder structure.
 An overview can be seen below:
 ```
-app/code/local/BillysBilling -> app/code/local/
+app/code/community/BillysBilling -> app/code/community/
 app/etc/modules/BillysBilling_Invoicer.xml -> app/etc/modules/
 ```
 Remember to flush the Magento cache, which can be done by logging into the Admin Panel, clicking System, then Cache Management and finally clicking Flush Magento Cache.
