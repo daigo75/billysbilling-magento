@@ -40,7 +40,7 @@
                         <shipping_account translate="label">
                             <label>Shipping Product</label>
                             <frontend_type>select</frontend_type>
-                            <source_model>billysbilling/products</source_model>
+                            <source_model>BillysBilling_Invoicer_Model_Products</source_model>
                             <sort_order>10</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>0</show_in_website>
@@ -49,7 +49,7 @@
                         <sales_account translate="label">
                             <label>Sales Account</label>
                             <frontend_type>select</frontend_type>
-                            <source_model>billysbilling/accounts</source_model>
+                            <source_model>BillysBilling_Invoicer_Model_Accounts</source_model>
                             <sort_order>20</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>0</show_in_website>
@@ -58,7 +58,7 @@
                         <vat_model translate="label">
                             <label>VAT Model</label>
                             <frontend_type>select</frontend_type>
-                            <source_model>billysbilling/vatmodels</source_model>
+                            <source_model>BillysBilling_Invoicer_Model_VatModels</source_model>
                             <sort_order>30</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>0</show_in_website>
