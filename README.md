@@ -22,3 +22,9 @@ Remember to flush the Magento cache, which can be done by logging into the Admin
 4. Enter your API key in the topmost textfield and Save Config.
 5. Choose shipping product, sales account and VAT model in the select boxes (products, account and VAT models retrieved from your Billy's Billing account) and Save Config.
 6. You will now get each order you invoice in Magento invoiced in Billy's Billing.
+
+##Version history
+###0.9.1
+* Added error handling with notification support in Magento admin
+###0.9.0
+* Initial release of the extension
