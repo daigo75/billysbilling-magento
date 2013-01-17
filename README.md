@@ -26,5 +26,6 @@ Remember to flush the Magento cache, which can be done by logging into the Admin
 ##Version history
 ###0.9.1
 * Added error handling with notification support in Magento admin
+
 ###0.9.0
 * Initial release of the extension
