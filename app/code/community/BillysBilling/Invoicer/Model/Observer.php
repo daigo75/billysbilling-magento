@@ -30,10 +30,18 @@ class BillysBilling_Invoicer_Model_Observer {
         $this->vatModelId = Mage::getStoreConfig("billy/invoicer/vat_model");
 
         // Create new client with API key
-        $this->client = new Billy_Client($this->apiKey);
+        try {
+            $this->client = new Billy_Client($this->apiKey);
+        } catch (Billy_Exception $e) {
+            BillysBilling_Invoicer_Helper_Data::printError($e);
+            return false;
+        }
 
         // Get contact ID
         $contactId = $this->insertIgnore("contacts", $order->getBillingAddress());
+        if ($contactId == null) {
+            return false;
+        }
 
         // Run through each order item
         $items = $order->getItemsCollection(array(), true);
@@ -41,6 +49,9 @@ class BillysBilling_Invoicer_Model_Observer {
         foreach ($items as $item) {
             // Get product ID
             $productId = $this->insertIgnore("products", $item);
+            if ($productId == null) {
+                return false;
+            }
 
             // Add item to product array
             $products[] = array(
@@ -60,15 +71,19 @@ class BillysBilling_Invoicer_Model_Observer {
         $date = date("Y-m-d", $order->getCreatedAtDate()->getTimestamp());
 
         // Create new invoice
-        $response = $this->client->post("invoices", array(
-            "type" => "invoice",
-            "contactId" => $contactId,
-            "entryDate" => $date,
-            "dueDate" => $date,
-            "currencyId" => Mage::app()->getStore()->getCurrentCurrencyCode(),
-            "state" => "approved",
-            "lines" => $products
-        ));
+        try {
+            $response = $this->client->post("invoices", array(
+                "type" => "invoice",
+                "contactId" => $contactId,
+                "entryDate" => $date,
+                "dueDate" => $date,
+                "currencyId" => Mage::app()->getStore()->getCurrentCurrencyCode(),
+                "state" => "approved",
+                "lines" => $products
+            ));
+        } catch (Billy_Exception $e) {
+            BillysBilling_Invoicer_Helper_Data::printError($e, "Error occurred on invoice creation.");
+        }
     }
 
     /**
@@ -85,15 +100,25 @@ class BillysBilling_Invoicer_Model_Observer {
         $data = $this->formatArray($type, $data);
 
         // Check for existing contact
-        $response = $this->client->get($type . "?q=" . urlencode($data['name']));
-        $responseArray = $response->$type;
+        $responseArray = array();
+        $id = null;
+        try {
+            $response = $this->client->get($type . "?q=" . urlencode($data['name']));
+            $responseArray = $response->$type;
+        } catch (Billy_Exception $e) {
+            BillysBilling_Invoicer_Helper_Data::printError($e, "Error occurred on getting " . $type . " data");
+        }
         if (count($responseArray) > 0) {
             // If existing contact, then save ID
             $id = $responseArray[0]->id;
         } else {
             // Create new contact and contact person, then save ID
-            $response = $this->client->post($type, $data);
-            $id = $response->id;
+            try {
+                $response = $this->client->post($type, $data);
+                $id = $response->id;
+            } catch (Billy_Exception $e) {
+                BillysBilling_Invoicer_Helper_Data::printError($e, "Error occurred on posting " . $type . " data");
+            }
         }
         return $id;
     }

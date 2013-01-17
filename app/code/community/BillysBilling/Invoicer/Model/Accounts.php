@@ -15,10 +15,30 @@ class BillysBilling_Invoicer_Model_Accounts {
         }
 
         // Create new client with API key
-        $client = new Billy_Client(Mage::getStoreConfig("billy/api/api_key"));
+        try {
+            $client = new Billy_Client(Mage::getStoreConfig("billy/api/api_key"));
+        } catch (Billy_Exception $e) {
+            BillysBilling_Invoicer_Helper_Data::printError($e);
+            return array(
+                array(
+                    "value" => "",
+                    "label" => "Please use a valid API key"
+                )
+            );
+        }
 
         // Get all accounts
-        $response = $client->get("accounts");
+        try {
+            $response = $client->get("accounts");
+        } catch (Billy_Exception $e) {
+            BillysBilling_Invoicer_Helper_Data::printError($e, "Error occurred on getting accounts data");
+            return array(
+                array(
+                    "value" => "",
+                    "label" => "Could not retrieve accounts from Billy API"
+                )
+            );
+        }
 
         // Map accounts to account types and sort account types
         $results = array();
