@@ -19,7 +19,9 @@ class BillysBilling_Invoicer_Model_Observer {
         $order = $observer->getOrder();
 
         // Include Billy's PHP SDK
-        require(dirname(__FILE__) . "/billysbilling-php/bootstrap.php");
+        if (!class_exists('Billy_Client')) {
+            require(dirname(__FILE__) . "/billysbilling-php/bootstrap.php");
+        }
 
         // Set variables
         $this->apiKey = Mage::getStoreConfig("billy/api/api_key");
