@@ -54,11 +54,21 @@ class BillysBilling_Invoicer_Model_Observer {
             }
 
             // Add item to product array
-            $products[] = array(
+            $product = array(
                 "productId" => $productId,
                 "quantity" => $item->getQtyInvoiced(),
                 "unitPrice" => $item->getPrice()
             );
+            // Apply discounts
+            if ($item->getDiscountPercent() > 0) {
+                $product["discountMode"] = "percent";
+                $product["discountValue"] = $item->getDiscountPercent();
+            } else if ($item->getDiscountAmount() > 0) {
+                $product["discountMode"] = "cash";
+                $product["discountValue"] = $item->getDiscountAmount();
+            }
+
+            $products[] = $product;
         }
         // Add shipping costs to product array
         $products[] = array(
