@@ -24,6 +24,11 @@ Remember to flush the Magento cache, which can be done by logging into the Admin
 6. You will now get each order you invoice in Magento invoiced in Billy's Billing.
 
 ##Version history
+###0.9.2
+* Added support for discount codes
+  * Billy's Billing applies discounts on prices including tax and the taxes are applied after the discount. This should therefore be configured the same way in Magento, which is done through System -> Configuration -> Tax under Calculation Settings. Apply Customer Tax should be set to After Discount and Apply Discount On Prices should be set to Including Tax.
+* Fixed minor bug regarding error notifications before API key is entered
+
 ###0.9.1
 * Added error handling with notification support in Magento admin
 
