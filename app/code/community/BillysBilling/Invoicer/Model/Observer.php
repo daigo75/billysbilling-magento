@@ -19,7 +19,7 @@ class BillysBilling_Invoicer_Model_Observer {
         $order = $observer->getOrder();
 
         // Include Billy's PHP SDK
-        if (!class_exists('Billy_Client')) {
+        if (!class_exists('Billy_Client', false)) {
             require(dirname(__FILE__) . "/billysbilling-php/bootstrap.php");
         }
 
