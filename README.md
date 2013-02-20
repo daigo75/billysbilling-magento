@@ -6,6 +6,13 @@ Invoice extension for Magento from the Danish accounting program [Billy's Billin
 
 Please read [API Terms](https://dev.billysbilling.dk/api-terms) before use.
 
+##Requirements
+Currently supports the following Magento versions:
+* v1.7 (v1.7.0.2)
+* v1.6 (v1.6.2.0)
+* v1.5 (v1.5.1.0)
+* v1.4 (v1.4.2.0)
+
 ##Installation
 Download code and move the files/folders to positions inside Magento corresponding to the current folder structure.
 An overview can be seen below:
@@ -25,6 +32,9 @@ Remember to flush the Magento cache, which can be done by logging into the Admin
 6. You will now get each order you invoice in Magento invoiced in Billy's Billing.
 
 ##Version history
+###0.9.3
+* Added support for earlier Magento versions
+
 ###0.9.2
 * Added support for discount codes
   * Billy's Billing applies discounts on prices including tax and the taxes are applied after the discount. This should therefore be configured the same way in Magento, which is done through System -> Configuration -> Tax under Calculation Settings. Apply Customer Tax should be set to After Discount and Apply Discount On Prices should be set to Including Tax.
