@@ -18,6 +18,7 @@ Remember to flush the Magento cache, which can be done by logging into the Admin
 ##First time usage
 1. Log into your Magento Admin Panel.
 2. Navigate to the Billy's Billing config page through System -> Configuration and then click on the Billy's Billing config page in the left pane.
+ * If you receive a 404 or Access Denied error, go to System -> Permissions -> Roles, select Administrators and click the Reset button in the top. Then log out and in again, and you should now be able to access the configuration page.
 3. Retrieve your API key from Billy's Billing (found in the API page under organization settings).
 4. Enter your API key in the topmost textfield and Save Config.
 5. Choose shipping product, sales account and VAT model in the select boxes (products, account and VAT models retrieved from your Billy's Billing account) and Save Config.
