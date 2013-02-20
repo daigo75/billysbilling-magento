@@ -1,6 +1,14 @@
 <?php
 class BillysBilling_Invoicer_Model_Products {
     public function toOptionArray() {
+        if (!Mage::getStoreConfig("billy/api/api_key") || strlen(Mage::getStoreConfig("billy/api/api_key")) < 10) {
+            return array(
+                array(
+                    "value" => "",
+                    "label" => "Please enter API key above and Save Config"
+                )
+            );
+        }
         // Include Billy's PHP SDK
         if (!class_exists('Billy_Client')) {
             require(dirname(__FILE__) . "/billysbilling-php/bootstrap.php");
