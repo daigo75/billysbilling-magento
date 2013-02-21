@@ -1,0 +1,18 @@
+<?php
+define("TEST_URL", ""); // URL for test site (without trailing slash)
+
+define("TEST_API_KEY", ""); // API Key from Billys Billing (32 characters)
+define("TEST_SHIPPING_PRODUCT", ""); // ID for shipping product
+define("TEST_SALES_ACCOUNT", ""); // ID for sales account
+define("TEST_VAT_MODEL", ""); // ID for VAT model
+
+define("TEST_PRODUCT_ID", 0); // Test product's ID
+
+define("TEST_CUSTOMER_FIRST_NAME", ""); // Test customer's first name
+define("TEST_CUSTOMER_LAST_NAME", ""); // Test customer's last name
+define("TEST_CUSTOMER_STREET", ""); // Test customer's street and number
+define("TEST_CUSTOMER_CITY", ""); // Test customer's city
+define("TEST_CUSTOMER_POSTCODE", ""); // Test customer's post code
+define("TEST_CUSTOMER_TELEPHONE", ""); // Test customer's phone number
+define("TEST_CUSTOMER_EMAIL", ""); // Test customer's email address
+define("TEST_CUSTOMER_COUNTRY_ID", ""); // Test customer's country ID (e.g. DK or US)

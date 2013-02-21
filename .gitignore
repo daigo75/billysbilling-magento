@@ -57,6 +57,7 @@ index.php.sample
 install.php
 mage
 php.ini.sample
+tests/config.php
 
 # Ignore subfolders
 app/code/community/Phoenix/*
