@@ -6,13 +6,6 @@ Invoice extension for Magento from the Danish accounting program [Billy's Billin
 
 Please read [API Terms](https://dev.billysbilling.dk/api-terms) before use.
 
-##Requirements
-Currently supports the following Magento versions:
-* v1.7 (v1.7.0.2)
-* v1.6 (v1.6.2.0)
-* v1.5 (v1.5.1.0)
-* v1.4 (v1.4.2.0)
-
 ##Installation
 Download code and move the files/folders to positions inside Magento corresponding to the current folder structure.
 An overview can be seen below:
@@ -30,6 +23,13 @@ Remember to flush the Magento cache, which can be done by logging into the Admin
 4. Enter your API key in the topmost textfield and Save Config.
 5. Choose shipping product, sales account and VAT model in the select boxes (products, account and VAT models retrieved from your Billy's Billing account) and Save Config.
 6. You will now get each order you invoice in Magento invoiced in Billy's Billing.
+
+##Magento support
+Currently supports the following Magento versions:
+* v1.7 (v1.7.0.2)
+* v1.6 (v1.6.2.0)
+* v1.5 (v1.5.1.0)
+* v1.4 (v1.4.2.0)
 
 ##Version history
 ###0.9.3
