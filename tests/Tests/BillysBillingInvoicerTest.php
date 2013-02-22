@@ -1,16 +1,17 @@
 <?php
 class BillysBillingInvoicerTest extends PHPUnit_Framework_TestCase {
 
+    protected $outputFile;
     protected $addressData;
+    protected $orderId;
 
     protected function setUp() {
-        Mage::getConfig()->saveConfig("billy/api/api_key", TEST_API_KEY);
-        Mage::getConfig()->saveConfig("billy/invoicer/shipping_account", TEST_SHIPPING_PRODUCT);
-        Mage::getConfig()->saveConfig("billy/invoicer/sales_account", TEST_SALES_ACCOUNT);
-        Mage::getConfig()->saveConfig("billy/invoicer/vat_model", TEST_VAT_MODEL);
+        // Enable test mode
+        Mage::getConfig()->saveConfig("billy/invoicer/mode", "test");
         Mage::getConfig()->reinit();
         Mage::app()->reinitStores();
 
+        // Set test customer data
         $this->addressData = array(
             "firstname" => TEST_CUSTOMER_FIRST_NAME,
             "lastname" => TEST_CUSTOMER_LAST_NAME,
@@ -21,6 +22,24 @@ class BillysBillingInvoicerTest extends PHPUnit_Framework_TestCase {
             "email" => TEST_CUSTOMER_EMAIL,
             "country_id" => TEST_CUSTOMER_COUNTRY_ID
         );
+
+        // Create/reset output log
+        $this->outputFile = Mage::getBaseDir() . "/tests/output.log";
+        $handle = fopen($this->outputFile, "w");
+        fclose($handle);
+    }
+
+    protected function tearDown() {
+        // Remove test order
+        Mage::getModel("sales/order")->loadByIncrementId($this->orderId)->delete();
+
+        // Remove output log
+        unlink($this->outputFile);
+
+        // Switch away from test mode
+        Mage::getConfig()->saveConfig("billy/invoicer/mode", "");
+        Mage::getConfig()->reinit();
+        Mage::app()->reinitStores();
     }
 
     public function testCreateOrder() {
@@ -28,11 +47,11 @@ class BillysBillingInvoicerTest extends PHPUnit_Framework_TestCase {
 
         if ("do customer orders") {
             // For specific customer
-            $customer = Mage::getModel("customer/customer")->setWebsiteId(1)->loadByEmail("customer@example.com");
+            $customer = Mage::getModel("customer/customer")->setWebsiteId(1)->loadByEmail(TEST_CUSTOMER_EMAIL);
             $quote->assignCustomer($customer);
         } else {
             // For guest customer
-            $quote->setCustomerEmail("customer@example.com");
+            $quote->setCustomerEmail(TEST_CUSTOMER_EMAIL);
         }
 
         // Add product
@@ -53,13 +72,90 @@ class BillysBillingInvoicerTest extends PHPUnit_Framework_TestCase {
         $service = Mage::getModel("sales/service_quote", $quote);
         $service->submitAll();
         $order = $service->getOrder();
+        $this->orderId = $order->getIncrementId();
 
         // Invoice order
-        if($order->canInvoice()) {
+        if ($order->canInvoice()) {
             $invoiceId = Mage::getModel("sales/order_invoice_api")->create($order->getIncrementId(), array());
         }
         $invoice = Mage::getModel("sales/order_invoice")->loadByIncrementId($invoiceId);
         $invoice->save();
+
+        // Process output.log
+        $handle = fopen($this->outputFile, "r");
+        $contents = fread($handle, filesize($this->outputFile));
+        $lines = explode("\n", $contents);
+        fclose($handle);
+        $commands = array();
+        foreach ($lines as $line) {
+            if (!$line) continue;
+            $commands[] = json_decode($line, true);
+        }
+        // [0] GET contacts
+        $this->assertEquals("GET", $commands[0]["mode"]);
+        $this->assertEquals("contacts?q=" . urlencode(TEST_CUSTOMER_FIRST_NAME . " " . TEST_CUSTOMER_LAST_NAME), $commands[0]["address"]);
+        // [1] POST contacts
+        $this->assertEquals("POST", $commands[1]["mode"]);
+        $this->assertEquals("contacts", $commands[1]["address"]);
+        $this->assertEquals(array(
+            "name" => TEST_CUSTOMER_FIRST_NAME . " " . TEST_CUSTOMER_LAST_NAME,
+            "street" => TEST_CUSTOMER_STREET,
+            "zipcode" => TEST_CUSTOMER_POSTCODE,
+            "city" => TEST_CUSTOMER_CITY,
+            "countryId" => TEST_CUSTOMER_COUNTRY_ID,
+            "state" => null,
+            "phone" => TEST_CUSTOMER_TELEPHONE,
+            "fax" => null,
+            "persons" => array(
+                array(
+                    "name" => TEST_CUSTOMER_FIRST_NAME . " " . TEST_CUSTOMER_LAST_NAME,
+                    "email" => TEST_CUSTOMER_EMAIL,
+                    "phone" => TEST_CUSTOMER_TELEPHONE
+                )
+            )
+        ), $commands[1]["params"]);
+        // [2] GET products
+        $this->assertEquals("GET", $commands[2]["mode"]);
+        $this->assertEquals("products?q=" . urlencode(TEST_PRODUCT_NAME), $commands[2]["address"]);
+        // [3] POST products
+        $this->assertEquals("POST", $commands[3]["mode"]);
+        $this->assertEquals("products", $commands[3]["address"]);
+        $this->assertEquals(array(
+            "name" => TEST_PRODUCT_NAME,
+            "accountId" => Mage::getStoreConfig("billy/invoicer/sales_account"),
+            "vatModelId" => Mage::getStoreConfig("billy/invoicer/vat_model"),
+            "productType" => "product",
+            "productNo" => TEST_PRODUCT_ID,
+            "suppliersProductNo" => TEST_PRODUCT_SUPPLIER_ID,
+            "prices" => array(
+                array(
+                    "currencyId" => TEST_CURRENCY,
+                    "unitPrice" => TEST_PRODUCT_PRICE
+                )
+            )
+        ), $commands[3]["params"]);
+        // [4] POST invoices
+        $this->assertEquals("POST", $commands[4]["mode"]);
+        $this->assertEquals("invoices", $commands[4]["address"]);
+        $this->assertEquals(array(
+            "type" => "invoice",
+            "contactId" => "12345-ABCDEFGHIJKLMNOP",
+            "entryDate" => date("Y-m-d"),
+            "dueDate" => date("Y-m-d"),
+            "currencyId" => TEST_CURRENCY,
+            "state" => "approved",
+            "lines" => array(
+                array(
+                    "productId" => "12345-ABCDEFGHIJKLMNOP",
+                    "quantity" => 1,
+                    "unitPrice" => number_format(TEST_PRODUCT_PRICE, 4)
+                ),
+                array(
+                    "productId" => Mage::getStoreConfig("billy/invoicer/shipping_account"),
+                    "quantity" => 1,
+                    "unitPrice" => number_format(TEST_SHIPPING_PRICE, 4)
+                )
+            )
+        ), $commands[4]["params"]);
     }
 }
-?>

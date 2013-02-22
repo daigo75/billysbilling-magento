@@ -1,12 +1,13 @@
 <?php
 define("TEST_URL", ""); // URL for test site (without trailing slash)
 
-define("TEST_API_KEY", ""); // API Key from Billys Billing (32 characters)
-define("TEST_SHIPPING_PRODUCT", ""); // ID for shipping product
-define("TEST_SALES_ACCOUNT", ""); // ID for sales account
-define("TEST_VAT_MODEL", ""); // ID for VAT model
+define("TEST_CURRENCY", ""); // Test order's currency (should be shop default currency)
+define("TEST_SHIPPING_PRICE", 0); // Test order's shipping price
 
 define("TEST_PRODUCT_ID", 0); // Test product's ID
+define("TEST_PRODUCT_NAME", ""); // Test product's name
+define("TEST_PRODUCT_SUPPLIER_ID", ""); // Test product's supplier number
+define("TEST_PRODUCT_PRICE", 0); // Test product's price
 
 define("TEST_CUSTOMER_FIRST_NAME", ""); // Test customer's first name
 define("TEST_CUSTOMER_LAST_NAME", ""); // Test customer's last name
