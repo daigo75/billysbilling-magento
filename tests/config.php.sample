@@ -2,12 +2,18 @@
 define("TEST_URL", ""); // URL for test site (without trailing slash)
 
 define("TEST_CURRENCY", ""); // Test order's currency (should be shop default currency)
-define("TEST_SHIPPING_PRICE", 0); // Test order's shipping price
 
 define("TEST_PRODUCT_ID", 0); // Test product's ID
 define("TEST_PRODUCT_NAME", ""); // Test product's name
 define("TEST_PRODUCT_SUPPLIER_ID", ""); // Test product's supplier number
 define("TEST_PRODUCT_PRICE", 0); // Test product's price
+define("TEST_PRODUCT_SHIPPING_PRICE", 0); // Test product's shipping price
+
+define("TEST_PRODUCT2_ID", 0); // Test product 2's ID
+define("TEST_PRODUCT2_NAME", ""); // Test product 2's name
+define("TEST_PRODUCT2_SUPPLIER_ID", ""); // Test product 2's supplier number
+define("TEST_PRODUCT2_PRICE", 0); // Test product 2's price
+define("TEST_PRODUCT2_SHIPPING_PRICE", 0); // Test product 2's shipping price
 
 define("TEST_CUSTOMER_FIRST_NAME", ""); // Test customer's first name
 define("TEST_CUSTOMER_LAST_NAME", ""); // Test customer's last name
