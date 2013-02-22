@@ -1,6 +1,8 @@
 <?php
 class BillysBilling_Invoicer_Model_Observer {
 
+    private $testMode = false;
+
     private $apiKey = "";
     private $shippingId = "";
     private $accountId = "";
@@ -16,6 +18,10 @@ class BillysBilling_Invoicer_Model_Observer {
      * @param $observer
      */
     public function saveInvoiceOnSuccess($observer) {
+        if (Mage::getStoreConfig("billy/invoicer/mode") && Mage::getStoreConfig("billy/invoicer/mode") == "test") {
+            $this->testMode = true;
+        }
+
         $this->setVariables(
             Mage::getStoreConfig("billy/api/api_key"),
             Mage::getStoreConfig("billy/invoicer/shipping_account"),
@@ -114,19 +120,23 @@ class BillysBilling_Invoicer_Model_Observer {
 
         // Order date
         $date = date("Y-m-d", $order->getCreatedAtDate()->getTimestamp());
+        // Set invoice data
+        $invoice = array(
+            "type" => "invoice",
+            "contactId" => $contactId,
+            "entryDate" => $date,
+            "dueDate" => $date,
+            "currencyId" => Mage::app()->getStore()->getCurrentCurrencyCode(),
+            "state" => "approved",
+            "lines" => $products
+        );
 
         // Create new invoice
         try {
-            $response = $this->client->post("invoices", array(
-                "type" => "invoice",
-                "contactId" => $contactId,
-                "entryDate" => $date,
-                "dueDate" => $date,
-                "currencyId" => Mage::app()->getStore()->getCurrentCurrencyCode(),
-                "state" => "approved",
-                "lines" => $products
-            ));
-            return $response;
+            if ($this->testMode) {
+                return $this->client->fakePost(Mage::getBaseDir() . "/tests/output.log", "invoices", $invoice);
+            }
+            return $this->client->post("invoices", $invoice);
         } catch (Billy_Exception $e) {
             BillysBilling_Invoicer_Helper_Data::printError($e, "Error occurred on invoice creation.");
         }
@@ -149,7 +159,12 @@ class BillysBilling_Invoicer_Model_Observer {
         $responseArray = array();
         $id = null;
         try {
-            $response = $this->client->get($type . "?q=" . urlencode($data['name']));
+            $address = $type . "?q=" . urlencode($data['name']);
+            if ($this->testMode) {
+                $response = $this->client->fakeGet(Mage::getBaseDir() . "/tests/output.log", $address);
+            } else {
+                $response = $this->client->get($address);
+            }
             $responseArray = $response->$type;
         } catch (Billy_Exception $e) {
             BillysBilling_Invoicer_Helper_Data::printError($e, "Error occurred on getting " . $type . " data");
@@ -160,7 +175,11 @@ class BillysBilling_Invoicer_Model_Observer {
         } else {
             // Create new contact and contact person, then save ID
             try {
-                $response = $this->client->post($type, $data);
+                if ($this->testMode) {
+                    $response = $this->client->fakePost(Mage::getBaseDir() . "/tests/output.log", $type, $data);
+                } else {
+                    $response = $this->client->post($type, $data);
+                }
                 $id = $response->id;
             } catch (Billy_Exception $e) {
                 BillysBilling_Invoicer_Helper_Data::printError($e, "Error occurred on posting " . $type . " data");
