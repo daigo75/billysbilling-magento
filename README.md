@@ -31,6 +31,15 @@ Currently supports the following Magento versions:
 * v1.5 (v1.5.1.0)
 * v1.4 (v1.4.2.0)
 
+##Testing
+Everything in the tests directory are only used for testing purposes. The testing is based and depends on [PHPUnit]{http://www.phpunit.de/manual/current/en/}.
+
+If you wish to run the tests yourself, you need rename `tests/config.php.sample` to `tests/config.php` and define the variables according to the instructions in the file.
+
+The tests relies on the ability to create/read/write a file in the tests directory, so consider this, if you run into problems executing the tests.
+
+_You should only run the tests in a development environment._ The tests automatically creates and deletes orders, which could possibly affect other parts of the shop. The tests takes care of resetting product stock levels after each test, but this might not be sufficient for a production environment.
+
 ##Version history
 ###0.9.4
 * Added unit testing
