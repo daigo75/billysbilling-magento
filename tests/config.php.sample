@@ -1,25 +1,42 @@
 <?php
-define("TEST_URL", ""); // URL for test site (without trailing slash)
-
-define("TEST_CURRENCY", ""); // Test order's currency (should be shop default currency)
-
-define("TEST_PRODUCT_ID", 0); // Test product's ID
-define("TEST_PRODUCT_NAME", ""); // Test product's name
-define("TEST_PRODUCT_SUPPLIER_ID", ""); // Test product's supplier number
-define("TEST_PRODUCT_PRICE", 0); // Test product's price
-define("TEST_PRODUCT_SHIPPING_PRICE", 0); // Test product's shipping price
-
-define("TEST_PRODUCT2_ID", 0); // Test product 2's ID
-define("TEST_PRODUCT2_NAME", ""); // Test product 2's name
-define("TEST_PRODUCT2_SUPPLIER_ID", ""); // Test product 2's supplier number
-define("TEST_PRODUCT2_PRICE", 0); // Test product 2's price
-define("TEST_PRODUCT2_SHIPPING_PRICE", 0); // Test product 2's shipping price
-
-define("TEST_CUSTOMER_FIRST_NAME", ""); // Test customer's first name
-define("TEST_CUSTOMER_LAST_NAME", ""); // Test customer's last name
-define("TEST_CUSTOMER_STREET", ""); // Test customer's street and number
-define("TEST_CUSTOMER_CITY", ""); // Test customer's city
-define("TEST_CUSTOMER_POSTCODE", ""); // Test customer's post code
-define("TEST_CUSTOMER_TELEPHONE", ""); // Test customer's phone number
-define("TEST_CUSTOMER_EMAIL", ""); // Test customer's email address
-define("TEST_CUSTOMER_COUNTRY_ID", ""); // Test customer's country ID (e.g. DK or US)
+$testConfig = array(
+    "currency" => "DKK", // Test order's currency (should be shop default currency)
+    "discounts" => array(
+        "cash" => array( // Cash discount
+            "code" => "", // Discount code
+            "amount" => 0 // Amount on the discount code
+        ),
+        "percentage" => array( // Percentage discount
+            "code" => "", // Discount code
+            "amount" => 0 // Amount on the discount code
+        ),
+        "free_shipping" => array( // Free shipping discount
+            "code" => "" // Discount code
+        ),
+        "cart_cash" => array( // Cart cash discount
+            "code" => "", // Discount code
+            "amount" => 0 // Amount on the discount code
+        )
+    ),
+    "products" => array( // Add at least two products here
+        array(
+            "id" => 0, // Test product's ID
+            "name" => "", // Test product's name
+            "supplier_id" => "", // Test product's supplier number
+            "price" => 0, // Test product's price
+            "shipping_price" => 0 // Test product's shipping price
+        )
+    ),
+    "addresses" => array( // Add at least two addresses here
+        array(
+            "firstname" => "", // Test customer's first name
+            "lastname" => "", // Test customer's last name
+            "street" => "", // Test customer's street and number
+            "city" => "", // Test customer's city
+            "postcode" => "", // Test customer's post code
+            "telephone" => "", // Test customer's phone number
+            "email" => "", // Test customer's email address
+            "country_id" => "" // Test customer's country ID (e.g. DK or US)
+        )
+    )
+);

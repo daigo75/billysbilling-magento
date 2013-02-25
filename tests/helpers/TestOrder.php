@@ -4,10 +4,10 @@ class TestOrder {
 
     public function __construct() {
         $this->quote = Mage::getModel("sales/quote")->setStoreId(Mage::app()->getStore("default")->getId());
-        $this->quote->setCustomerEmail(TEST_CUSTOMER_EMAIL);
     }
 
     public function addProduct($productId, $quantity = 1) {
+        // Add product
         $product = Mage::getModel("catalog/product")->load($productId);
         $buyInfo = array(
             "qty" => $quantity
@@ -15,22 +15,31 @@ class TestOrder {
         $this->quote->addProduct($product, new Varien_Object($buyInfo));
     }
 
-    public function finalize() {
-        // Add address, shipping and payment information
-        $addressData = array(
-            "firstname" => TEST_CUSTOMER_FIRST_NAME,
-            "lastname" => TEST_CUSTOMER_LAST_NAME,
-            "street" => TEST_CUSTOMER_STREET,
-            "city" => TEST_CUSTOMER_CITY,
-            "postcode" => TEST_CUSTOMER_POSTCODE,
-            "telephone" => TEST_CUSTOMER_TELEPHONE,
-            "email" => TEST_CUSTOMER_EMAIL,
-            "country_id" => TEST_CUSTOMER_COUNTRY_ID
-        );
-        $billingAddress = $this->quote->getBillingAddress()->addData($addressData);
-        $shippingAddress = $this->quote->getShippingAddress()->addData($addressData);
+    public function setShipping($addressData, $addressData2 = null, $freeShipping = false) {
+        // Add addresses
+        $this->quote->setCustomerEmail($addressData["email"]);
+        $this->quote->getBillingAddress()->addData($addressData);
+        $shippingAddress = $this->quote->getShippingAddress()->addData($addressData2 ? $addressData2 : $addressData);
+        // Handle possible free shipping
+        if ($freeShipping) {
+            $shippingAddress->setFreeShipping(true);
+        }
+        // Set shipping and payment
         $shippingAddress->setCollectShippingRates(true)->collectShippingRates()->setShippingMethod("flatrate_flatrate")->setPaymentMethod("checkmo");
         $this->quote->getPayment()->importData(array("method" => "checkmo"));
+    }
+
+    public function addDiscountCode($code) {
+        // Add discount codes and update totals
+        $this->quote->setCouponCode($code)->save();
+        if ($code != $this->quote->getCouponCode()) {
+            throw new Exception('Coupon code is not valid.');
+        }
+        $this->quote->setTotalsCollectedFlag(false)->collectTotals()->save();
+    }
+
+    public function finalize() {
+        // Update totals
         $this->quote->collectTotals()->save();
 
         // Create order
