@@ -22,39 +22,12 @@ class BillysBilling_Invoicer_Model_Observer {
             $this->testMode = true;
         }
 
-        $this->setVariables(
-            Mage::getStoreConfig("billy/api/api_key"),
-            Mage::getStoreConfig("billy/invoicer/shipping_account"),
-            Mage::getStoreConfig("billy/invoicer/sales_account"),
-            Mage::getStoreConfig("billy/invoicer/vat_model")
-        );
-
-        $this->run($observer->getOrder());
-    }
-
-    /**
-     * Set each of the required variables.
-     *
-     * @param $apiKey
-     * @param $shippingId
-     * @param $accountId
-     * @param $vatModelId
-     */
-    public function setVariables($apiKey, $shippingId, $accountId, $vatModelId) {
         // Set variables
-        $this->apiKey = $apiKey;
-        $this->shippingId = $shippingId;
-        $this->accountId = $accountId;
-        $this->vatModelId = $vatModelId;
-    }
+        $this->apiKey = Mage::getStoreConfig("billy/api/api_key");
+        $this->shippingId = Mage::getStoreConfig("billy/invoicer/shipping_account");
+        $this->accountId = Mage::getStoreConfig("billy/invoicer/sales_account");
+        $this->vatModelId = Mage::getStoreConfig("billy/invoicer/vat_model");
 
-    /**
-     * Run the invoicer.
-     *
-     * @param $order
-     * @return array Response from API for invoice creation
-     */
-    public function run($order) {
         // Include Billy's PHP SDK
         if (!class_exists('Billy_Client', false)) {
             require(dirname(__FILE__) . "/billysbilling-php/bootstrap.php");
@@ -68,7 +41,7 @@ class BillysBilling_Invoicer_Model_Observer {
             return false;
         }
 
-        return $this->createInvoice($order);
+        return $this->createInvoice($observer->getOrder());
     }
 
     /**
@@ -77,7 +50,7 @@ class BillysBilling_Invoicer_Model_Observer {
      * @param $order
      * @return array Response from API for invoice creation
      */
-    public function createInvoice($order) {
+    private function createInvoice($order) {
         // Get contact ID
         $contactId = $this->insertIgnore("contacts", $order->getBillingAddress());
         if ($contactId == null) {
@@ -151,7 +124,7 @@ class BillysBilling_Invoicer_Model_Observer {
      *
      * @return int ID of inserted or found entry
      */
-    public function insertIgnore($type, $data) {
+    private function insertIgnore($type, $data) {
         // Format data
         $data = $this->formatArray($type, $data);
 
@@ -195,7 +168,7 @@ class BillysBilling_Invoicer_Model_Observer {
      * @param $data BillingAddress object or Item object
      * @return array of either contact or product
      */
-    public function formatArray($type, $data) {
+    private function formatArray($type, $data) {
         if ($type == "contacts") {
             // Set name depending on company or not
             if ($data->getCompany()) {
