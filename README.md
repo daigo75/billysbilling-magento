@@ -1,6 +1,6 @@
 #Billy's Billing Magento Extension
 
-_This extension is an alpha version_. If you experience any bugs, please report them on the [Issues page](https://github.com/billysbilling/billysbilling-magento/issues).
+_This extension is a beta version_. If you experience any bugs, please report them on the [Issues page](https://github.com/billysbilling/billysbilling-magento/issues).
 
 Invoice extension for Magento from the Danish accounting program [Billy's Billing](http://www.billysbilling.dk/) via [Billy's Billing API](http://dev.billysbilling.dk/).
 
@@ -32,6 +32,9 @@ Currently supports the following Magento versions:
 * v1.4 (v1.4.2.0)
 
 ##Version history
+###0.9.4
+* Added unit testing
+
 ###0.9.3
 * Added support for earlier Magento versions
 
