@@ -32,7 +32,7 @@ Currently supports the following Magento versions:
 * v1.4 (v1.4.2.0)
 
 ##Testing
-Everything in the tests directory are only used for testing purposes. The testing is based and depends on [PHPUnit]{http://www.phpunit.de/manual/current/en/}.
+Everything in the tests directory are only used for testing purposes. The testing is based and depends on [PHPUnit](http://www.phpunit.de/manual/current/en/).
 
 If you wish to run the tests yourself, you need rename `tests/config.php.sample` to `tests/config.php` and define the variables according to the instructions in the file.
 
