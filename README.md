@@ -1,10 +1,10 @@
 #Billy's Billing Magento Extension
 
-_This extension is a beta version_. If you experience any bugs, please report them on the [Issues page](https://github.com/billysbilling/billysbilling-magento/issues).
-
 Invoice extension for Magento from the Danish accounting program [Billy's Billing](http://www.billysbilling.dk/) via [Billy's Billing API](http://dev.billysbilling.dk/).
 
 Please read [API Terms](https://dev.billysbilling.dk/api-terms) before use.
+
+If you experience any bugs, please report them on the [Issues page](https://github.com/billysbilling/billysbilling-magento/issues).
 
 ##Installation
 Download code and move the files/folders to positions inside Magento corresponding to the current folder structure.
@@ -41,6 +41,9 @@ The tests relies on the ability to create/read/write a file in the tests directo
 _You should only run the tests in a development environment._ The tests automatically creates and deletes orders, which could possibly affect other parts of the shop. The tests takes care of resetting product stock levels after each test, but this might not be sufficient for a production environment.
 
 ##Version history
+###1.0.0
+* First stable release
+
 ###0.9.4
 * Added unit testing
 
