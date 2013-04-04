@@ -21,7 +21,7 @@ Remember to flush the Magento cache, which can be done by logging into the Admin
  * If you receive a 404 or Access Denied error, go to System -> Permissions -> Roles, select Administrators and click the Reset button in the top. Then log out and in again, and you should now be able to access the configuration page.
 3. Retrieve your API key from Billy's Billing (found in the API page under organization settings).
 4. Enter your API key in the topmost textfield and Save Config.
-5. Choose shipping product, sales account and VAT model in the select boxes (products, account and VAT models retrieved from your Billy's Billing account) and Save Config.
+5. Choose shipping product, sales account, VAT model, and bank account in the select boxes (products, accounts and VAT models retrieved from your Billy's Billing account) and Save Config.
 6. You will now get each order you invoice in Magento invoiced in Billy's Billing.
 
 ##Magento support
@@ -41,6 +41,12 @@ The tests relies on the ability to create/read/write a file in the tests directo
 _You should only run the tests in a development environment._ The tests automatically creates and deletes orders, which could possibly affect other parts of the shop. The tests takes care of resetting product stock levels after each test, but this might not be sufficient for a production environment.
 
 ##Version history
+###1.0.2
+* Added sending of payments along with invoices
+
+###1.0.1
+* Added support for newer PHP versions
+
 ###1.0.0
 * First stable release
 

@@ -118,6 +118,15 @@ class BillysBillingInvoicerTest extends PHPUnit_Framework_TestCase {
                 )
             )
         ));
+        // [5] POST payments
+        $this->assertCall($commands[5], "POST", "payments", array(
+            "paidDate" => date("Y-m-d"),
+            "accountId" => Mage::getStoreConfig("billy/invoicer/bank_account"),
+            "amount" => formatNum($product1["price"] * 1.25 + $product1["shipping_price"], 2),
+            "invoiceIds" => array(
+                "12345-ABCDEFGHIJKLMNOP"
+            )
+        ));
     }
 
     public function testOrderWithMultipleProducts() {
@@ -212,6 +221,15 @@ class BillysBillingInvoicerTest extends PHPUnit_Framework_TestCase {
                 )
             )
         ));
+        // [7] POST payments
+        $this->assertCall($commands[7], "POST", "payments", array(
+            "paidDate" => date("Y-m-d"),
+            "accountId" => Mage::getStoreConfig("billy/invoicer/bank_account"),
+            "amount" => formatNum((2*$product1["price"] + $product2["price"]) * 1.25 + $product1["shipping_price"] + $product2["shipping_price"], 2),
+            "invoiceIds" => array(
+                "12345-ABCDEFGHIJKLMNOP"
+            )
+        ));
     }
 
     public function testOrderWithPercentageDiscount() {
@@ -285,6 +303,15 @@ class BillysBillingInvoicerTest extends PHPUnit_Framework_TestCase {
                 )
             )
         ));
+        // [5] POST payments
+        $this->assertCall($commands[5], "POST", "payments", array(
+            "paidDate" => date("Y-m-d"),
+            "accountId" => Mage::getStoreConfig("billy/invoicer/bank_account"),
+            "amount" => formatNum(($product1["price"] - $product1["price"] * 1.25 * BillysBillingInvoicerTest::$testConfig["discounts"]["percentage"]["amount"] / 100) * 1.25 + $product1["shipping_price"], 2),
+            "invoiceIds" => array(
+                "12345-ABCDEFGHIJKLMNOP"
+            )
+        ));
     }
 
     public function testOrderWithCashDiscount() {
@@ -356,6 +383,15 @@ class BillysBillingInvoicerTest extends PHPUnit_Framework_TestCase {
                     "quantity" => 1,
                     "unitPrice" => formatNum($product1["shipping_price"])
                 )
+            )
+        ));
+        // [5] POST payments
+        $this->assertCall($commands[5], "POST", "payments", array(
+            "paidDate" => date("Y-m-d"),
+            "accountId" => Mage::getStoreConfig("billy/invoicer/bank_account"),
+            "amount" => formatNum($product1["price"] * 1.25 + $product1["shipping_price"] - BillysBillingInvoicerTest::$testConfig["discounts"]["cash"]["amount"] * 1.25, 2),
+            "invoiceIds" => array(
+                "12345-ABCDEFGHIJKLMNOP"
             )
         ));
     }
@@ -457,6 +493,15 @@ class BillysBillingInvoicerTest extends PHPUnit_Framework_TestCase {
                 )
             )
         ));
+        // [7] POST payments
+        $this->assertCall($commands[7], "POST", "payments", array(
+            "paidDate" => date("Y-m-d"),
+            "accountId" => Mage::getStoreConfig("billy/invoicer/bank_account"),
+            "amount" => formatNum((2*$product1["price"] + $product2["price"]) * 1.25 + $product1["shipping_price"] + $product2["shipping_price"] - BillysBillingInvoicerTest::$testConfig["discounts"]["cart_cash"]["amount"] * 1.25, 2),
+            "invoiceIds" => array(
+                "12345-ABCDEFGHIJKLMNOP"
+            )
+        ));
     }
 
     public function testOrderWithFreeShipping() {
@@ -552,6 +597,15 @@ class BillysBillingInvoicerTest extends PHPUnit_Framework_TestCase {
                 )
             )
         ));
+        // [7] POST payments
+        $this->assertCall($commands[7], "POST", "payments", array(
+            "paidDate" => date("Y-m-d"),
+            "accountId" => Mage::getStoreConfig("billy/invoicer/bank_account"),
+            "amount" => formatNum((2*$product1["price"] + $product2["price"]) * 1.25, 2),
+            "invoiceIds" => array(
+                "12345-ABCDEFGHIJKLMNOP"
+            )
+        ));
     }
 
     public function testOrderWithDifferentAddresses() {
@@ -621,6 +675,15 @@ class BillysBillingInvoicerTest extends PHPUnit_Framework_TestCase {
                     "quantity" => 1,
                     "unitPrice" => formatNum($product1["shipping_price"])
                 )
+            )
+        ));
+        // [5] POST payments
+        $this->assertCall($commands[5], "POST", "payments", array(
+            "paidDate" => date("Y-m-d"),
+            "accountId" => Mage::getStoreConfig("billy/invoicer/bank_account"),
+            "amount" => formatNum($product1["price"] * 1.25 + $product1["shipping_price"], 2),
+            "invoiceIds" => array(
+                "12345-ABCDEFGHIJKLMNOP"
             )
         ));
     }

@@ -7,6 +7,7 @@ class BillysBilling_Invoicer_Model_Observer {
     private $shippingId = "";
     private $accountId = "";
     private $vatModelId = "";
+    private $bankAccountId = "";
 
     private $client;
 
@@ -27,6 +28,7 @@ class BillysBilling_Invoicer_Model_Observer {
         $this->shippingId = Mage::getStoreConfig("billy/invoicer/shipping_account");
         $this->accountId = Mage::getStoreConfig("billy/invoicer/sales_account");
         $this->vatModelId = Mage::getStoreConfig("billy/invoicer/vat_model");
+        $this->bankAccountId = Mage::getStoreConfig("billy/invoicer/bank_account");
 
         // Include Billy's PHP SDK
         if (!class_exists('Billy_Client', false)) {
@@ -107,12 +109,27 @@ class BillysBilling_Invoicer_Model_Observer {
         // Create new invoice
         try {
             if ($this->testMode) {
-                return $this->client->fakePost(Mage::getBaseDir() . "/tests/output.log", "invoices", $invoice);
+                $response = $this->client->fakePost(Mage::getBaseDir() . "/tests/output.log", "invoices", $invoice);
             }
-            return $this->client->post("invoices", $invoice);
+            $response = $this->client->post("invoices", $invoice);
         } catch (Billy_Exception $e) {
             BillysBilling_Invoicer_Helper_Data::printError($e, "Error occurred on invoice creation.");
         }
+        if ($response->success) {
+            $payment = array(
+                "paidDate" => $date,
+                "accountId" => $this->bankAccountId,
+                "amount" => $order->getTotalPaid(),
+                "invoiceIds" => array(
+                    $response->id
+                )
+            );
+            if ($this->testMode) {
+                return $this->client->fakePost(Mage::getBaseDir() . "/tests/output.log", "payments", $payment);
+            }
+            return $this->client->post("payments", $payment);
+        }
+        return $response;
     }
 
     /**
