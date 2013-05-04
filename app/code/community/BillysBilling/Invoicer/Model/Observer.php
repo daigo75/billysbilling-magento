@@ -8,6 +8,7 @@ class BillysBilling_Invoicer_Model_Observer {
     private $accountId = "";
     private $vatModelId = "";
     private $bankAccountId = "";
+    private $disablePayments = false;
 
     private $client;
 
@@ -29,6 +30,7 @@ class BillysBilling_Invoicer_Model_Observer {
         $this->accountId = Mage::getStoreConfig("billy/invoicer/sales_account");
         $this->vatModelId = Mage::getStoreConfig("billy/invoicer/vat_model");
         $this->bankAccountId = Mage::getStoreConfig("billy/invoicer/bank_account");
+        $this->disablePayments = Mage::getStoreConfig("billy/invoicer/disable_payments");
 
         // Include Billy's PHP SDK
         if (!class_exists('Billy_Client', false)) {
@@ -115,7 +117,7 @@ class BillysBilling_Invoicer_Model_Observer {
         } catch (Billy_Exception $e) {
             BillysBilling_Invoicer_Helper_Data::printError($e, "Error occurred on invoice creation.");
         }
-        if ($response->success) {
+        if ($response->success && !$this->disablePayments) {
             $payment = array(
                 "paidDate" => $date,
                 "accountId" => $this->bankAccountId,
