@@ -83,6 +83,16 @@
                             <show_in_website>0</show_in_website>
                             <show_in_store>0</show_in_store>
                         </disable_payments>
+                        <due_date_offset translate="label">
+                            <label>Due date offset</label>
+                            <comment>This will offset the due date of the invoices by the number of days specified.</comment>
+                            <frontend_type>text</frontend_type>
+                            <validate>validate-zero-or-greater</validate>
+                            <sort_order>60</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </due_date_offset>
                     </fields>
                 </invoicer>
             </groups>

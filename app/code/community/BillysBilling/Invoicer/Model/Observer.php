@@ -9,6 +9,7 @@ class BillysBilling_Invoicer_Model_Observer {
     private $vatModelId = "";
     private $bankAccountId = "";
     private $disablePayments = false;
+    private $dueDateOffset = 0;
 
     private $client;
 
@@ -31,6 +32,7 @@ class BillysBilling_Invoicer_Model_Observer {
         $this->vatModelId = Mage::getStoreConfig("billy/invoicer/vat_model");
         $this->bankAccountId = Mage::getStoreConfig("billy/invoicer/bank_account");
         $this->disablePayments = Mage::getStoreConfig("billy/invoicer/disable_payments");
+        $this->dueDateOffset = Mage::getStoreConfig("billy/invoicer/due_date_offset");
 
         // Include Billy's PHP SDK
         if (!class_exists('Billy_Client', false)) {
@@ -97,12 +99,13 @@ class BillysBilling_Invoicer_Model_Observer {
 
         // Order date
         $date = date("Y-m-d", $order->getCreatedAtDate()->getTimestamp());
+        $dueDate = date("Y-m-d", $order->getCreatedAtDate()->getTimestamp() + $this->dueDateOffset * 86400);
         // Set invoice data
         $invoice = array(
             "type" => "invoice",
             "contactId" => $contactId,
             "entryDate" => $date,
-            "dueDate" => $date,
+            "dueDate" => $dueDate,
             "currencyId" => Mage::app()->getStore()->getCurrentCurrencyCode(),
             "state" => "approved",
             "lines" => $products
