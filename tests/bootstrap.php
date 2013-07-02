@@ -27,7 +27,7 @@ function checkConfig($config) {
         $errors[] = "Pre-test error: Too few products";
     }
     foreach ($config["products"] as $i => $product) {
-        foreach (array("id", "name", "supplier_id", "price", "shipping_price") as $unit) {
+        foreach (array("id", "name", "sku", "price", "shipping_price") as $unit) {
             if (!$product[$unit] && !is_numeric($product[$unit])) {
                 $errors[] = "Pre-test error: Missing " . $unit . " for product " . ($i+1);
             }

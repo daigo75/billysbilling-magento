@@ -61,7 +61,7 @@ class BillysBillingInvoicerTest extends PHPUnit_Framework_TestCase {
 
         $commands = getOutput();
         // [0] GET contacts
-        $this->assertCall($commands[0], "GET", "contacts?q=" . urlencode($address1["firstname"] . " " . $address1["lastname"]));
+        $this->assertCall($commands[0], "GET", "contacts?externalId=" . urlencode($address1["email"]));
         // [1] POST contacts
         $this->assertCall($commands[1], "POST", "contacts", array(
             "name" => $address1["firstname"] . " " . $address1["lastname"],
@@ -72,6 +72,7 @@ class BillysBillingInvoicerTest extends PHPUnit_Framework_TestCase {
             "state" => null,
             "phone" => $address1["telephone"],
             "fax" => null,
+            "externalId" => $address1["email"],
             "persons" => array(
                 array(
                     "name" => $address1["firstname"] . " " . $address1["lastname"],
@@ -81,15 +82,15 @@ class BillysBillingInvoicerTest extends PHPUnit_Framework_TestCase {
             )
         ));
         // [2] GET products
-        $this->assertCall($commands[2], "GET", "products?q=" . urlencode($product1["name"]));
+        $this->assertCall($commands[2], "GET", "products?externalId=" . urlencode($product1["sku"]));
         // [3] POST products
         $this->assertCall($commands[3], "POST", "products", array(
             "name" => $product1["name"],
             "accountId" => Mage::getStoreConfig("billy/invoicer/sales_account"),
             "vatModelId" => Mage::getStoreConfig("billy/invoicer/vat_model"),
             "productType" => "product",
-            "productNo" => $product1["id"],
-            "suppliersProductNo" => $product1["supplier_id"],
+            "productNo" => $product1["sku"],
+            "externalId" => $product1["sku"],
             "prices" => array(
                 array(
                     "currencyId" => BillysBillingInvoicerTest::$testConfig["currency"],
@@ -98,6 +99,7 @@ class BillysBillingInvoicerTest extends PHPUnit_Framework_TestCase {
             )
         ));
         // [4] POST invoices
+        unset($commands[4]["params"]["contactMessage"]);
         $this->assertCall($commands[4], "POST", "invoices", array(
             "type" => "invoice",
             "contactId" => "12345-ABCDEFGHIJKLMNOP",
@@ -142,7 +144,7 @@ class BillysBillingInvoicerTest extends PHPUnit_Framework_TestCase {
 
         $commands = getOutput();
         // [0] GET contacts
-        $this->assertCall($commands[0], "GET", "contacts?q=" . urlencode($address1["firstname"] . " " . $address1["lastname"]));
+        $this->assertCall($commands[0], "GET", "contacts?externalId=" . urlencode($address1["email"]));
         // [1] POST contacts
         $this->assertCall($commands[1], "POST", "contacts", array(
             "name" => $address1["firstname"] . " " . $address1["lastname"],
@@ -153,6 +155,7 @@ class BillysBillingInvoicerTest extends PHPUnit_Framework_TestCase {
             "state" => null,
             "phone" => $address1["telephone"],
             "fax" => null,
+            "externalId" => $address1["email"],
             "persons" => array(
                 array(
                     "name" => $address1["firstname"] . " " . $address1["lastname"],
@@ -162,15 +165,15 @@ class BillysBillingInvoicerTest extends PHPUnit_Framework_TestCase {
             )
         ));
         // [2] GET products
-        $this->assertCall($commands[2], "GET", "products?q=" . urlencode($product1["name"]));
+        $this->assertCall($commands[2], "GET", "products?externalId=" . urlencode($product1["sku"]));
         // [3] POST products
         $this->assertCall($commands[3], "POST", "products", array(
             "name" => $product1["name"],
             "accountId" => Mage::getStoreConfig("billy/invoicer/sales_account"),
             "vatModelId" => Mage::getStoreConfig("billy/invoicer/vat_model"),
             "productType" => "product",
-            "productNo" => $product1["id"],
-            "suppliersProductNo" => $product1["supplier_id"],
+            "productNo" => $product1["sku"],
+            "externalId" => $product1["sku"],
             "prices" => array(
                 array(
                     "currencyId" => BillysBillingInvoicerTest::$testConfig["currency"],
@@ -179,15 +182,15 @@ class BillysBillingInvoicerTest extends PHPUnit_Framework_TestCase {
             )
         ));
         // [4] GET products
-        $this->assertCall($commands[4], "GET", "products?q=" . urlencode($product2["name"]));
+        $this->assertCall($commands[4], "GET", "products?externalId=" . urlencode($product2["sku"]));
         // [5] POST products
         $this->assertCall($commands[5], "POST", "products", array(
             "name" => $product2["name"],
             "accountId" => Mage::getStoreConfig("billy/invoicer/sales_account"),
             "vatModelId" => Mage::getStoreConfig("billy/invoicer/vat_model"),
             "productType" => "product",
-            "productNo" => $product2["id"],
-            "suppliersProductNo" => $product2["supplier_id"],
+            "productNo" => $product2["sku"],
+            "externalId" => $product2["sku"],
             "prices" => array(
                 array(
                     "currencyId" => BillysBillingInvoicerTest::$testConfig["currency"],
@@ -196,6 +199,7 @@ class BillysBillingInvoicerTest extends PHPUnit_Framework_TestCase {
             )
         ));
         // [6] POST invoices
+        unset($commands[6]["params"]["contactMessage"]);
         $this->assertCall($commands[6], "POST", "invoices", array(
             "type" => "invoice",
             "contactId" => "12345-ABCDEFGHIJKLMNOP",
@@ -244,7 +248,7 @@ class BillysBillingInvoicerTest extends PHPUnit_Framework_TestCase {
 
         $commands = getOutput();
         // [0] GET contacts
-        $this->assertCall($commands[0], "GET", "contacts?q=" . urlencode($address1["firstname"] . " " . $address1["lastname"]));
+        $this->assertCall($commands[0], "GET", "contacts?externalId=" . urlencode($address1["email"]));
         // [1] POST contacts
         $this->assertCall($commands[1], "POST", "contacts", array(
             "name" => $address1["firstname"] . " " . $address1["lastname"],
@@ -255,6 +259,7 @@ class BillysBillingInvoicerTest extends PHPUnit_Framework_TestCase {
             "state" => null,
             "phone" => $address1["telephone"],
             "fax" => null,
+            "externalId" => $address1["email"],
             "persons" => array(
                 array(
                     "name" => $address1["firstname"] . " " . $address1["lastname"],
@@ -264,15 +269,15 @@ class BillysBillingInvoicerTest extends PHPUnit_Framework_TestCase {
             )
         ));
         // [2] GET products
-        $this->assertCall($commands[2], "GET", "products?q=" . urlencode($product1["name"]));
+        $this->assertCall($commands[2], "GET", "products?externalId=" . urlencode($product1["sku"]));
         // [3] POST products
         $this->assertCall($commands[3], "POST", "products", array(
             "name" => $product1["name"],
             "accountId" => Mage::getStoreConfig("billy/invoicer/sales_account"),
             "vatModelId" => Mage::getStoreConfig("billy/invoicer/vat_model"),
             "productType" => "product",
-            "productNo" => $product1["id"],
-            "suppliersProductNo" => $product1["supplier_id"],
+            "productNo" => $product1["sku"],
+            "externalId" => $product1["sku"],
             "prices" => array(
                 array(
                     "currencyId" => BillysBillingInvoicerTest::$testConfig["currency"],
@@ -281,6 +286,7 @@ class BillysBillingInvoicerTest extends PHPUnit_Framework_TestCase {
             )
         ));
         // [4] POST invoices
+        unset($commands[4]["params"]["contactMessage"]);
         $this->assertCall($commands[4], "POST", "invoices", array(
             "type" => "invoice",
             "contactId" => "12345-ABCDEFGHIJKLMNOP",
@@ -326,7 +332,7 @@ class BillysBillingInvoicerTest extends PHPUnit_Framework_TestCase {
 
         $commands = getOutput();
         // [0] GET contacts
-        $this->assertCall($commands[0], "GET", "contacts?q=" . urlencode($address1["firstname"] . " " . $address1["lastname"]));
+        $this->assertCall($commands[0], "GET", "contacts?externalId=" . urlencode($address1["email"]));
         // [1] POST contacts
         $this->assertCall($commands[1], "POST", "contacts", array(
             "name" => $address1["firstname"] . " " . $address1["lastname"],
@@ -337,6 +343,7 @@ class BillysBillingInvoicerTest extends PHPUnit_Framework_TestCase {
             "state" => null,
             "phone" => $address1["telephone"],
             "fax" => null,
+            "externalId" => $address1["email"],
             "persons" => array(
                 array(
                     "name" => $address1["firstname"] . " " . $address1["lastname"],
@@ -346,15 +353,15 @@ class BillysBillingInvoicerTest extends PHPUnit_Framework_TestCase {
             )
         ));
         // [2] GET products
-        $this->assertCall($commands[2], "GET", "products?q=" . urlencode($product1["name"]));
+        $this->assertCall($commands[2], "GET", "products?externalId=" . urlencode($product1["sku"]));
         // [3] POST products
         $this->assertCall($commands[3], "POST", "products", array(
             "name" => $product1["name"],
             "accountId" => Mage::getStoreConfig("billy/invoicer/sales_account"),
             "vatModelId" => Mage::getStoreConfig("billy/invoicer/vat_model"),
             "productType" => "product",
-            "productNo" => $product1["id"],
-            "suppliersProductNo" => $product1["supplier_id"],
+            "productNo" => $product1["sku"],
+            "externalId" => $product1["sku"],
             "prices" => array(
                 array(
                     "currencyId" => BillysBillingInvoicerTest::$testConfig["currency"],
@@ -363,6 +370,7 @@ class BillysBillingInvoicerTest extends PHPUnit_Framework_TestCase {
             )
         ));
         // [4] POST invoices
+        unset($commands[4]["params"]["contactMessage"]);
         $this->assertCall($commands[4], "POST", "invoices", array(
             "type" => "invoice",
             "contactId" => "12345-ABCDEFGHIJKLMNOP",
@@ -410,7 +418,7 @@ class BillysBillingInvoicerTest extends PHPUnit_Framework_TestCase {
 
         $commands = getOutput();
         // [0] GET contacts
-        $this->assertCall($commands[0], "GET", "contacts?q=" . urlencode($address1["firstname"] . " " . $address1["lastname"]));
+        $this->assertCall($commands[0], "GET", "contacts?externalId=" . urlencode($address1["email"]));
         // [1] POST contacts
         $this->assertCall($commands[1], "POST", "contacts", array(
             "name" => $address1["firstname"] . " " . $address1["lastname"],
@@ -421,6 +429,7 @@ class BillysBillingInvoicerTest extends PHPUnit_Framework_TestCase {
             "state" => null,
             "phone" => $address1["telephone"],
             "fax" => null,
+            "externalId" => $address1["email"],
             "persons" => array(
                 array(
                     "name" => $address1["firstname"] . " " . $address1["lastname"],
@@ -430,15 +439,15 @@ class BillysBillingInvoicerTest extends PHPUnit_Framework_TestCase {
             )
         ));
         // [2] GET products
-        $this->assertCall($commands[2], "GET", "products?q=" . urlencode($product1["name"]));
+        $this->assertCall($commands[2], "GET", "products?externalId=" . urlencode($product1["sku"]));
         // [3] POST products
         $this->assertCall($commands[3], "POST", "products", array(
             "name" => $product1["name"],
             "accountId" => Mage::getStoreConfig("billy/invoicer/sales_account"),
             "vatModelId" => Mage::getStoreConfig("billy/invoicer/vat_model"),
             "productType" => "product",
-            "productNo" => $product1["id"],
-            "suppliersProductNo" => $product1["supplier_id"],
+            "productNo" => $product1["sku"],
+            "externalId" => $product1["sku"],
             "prices" => array(
                 array(
                     "currencyId" => BillysBillingInvoicerTest::$testConfig["currency"],
@@ -447,15 +456,15 @@ class BillysBillingInvoicerTest extends PHPUnit_Framework_TestCase {
             )
         ));
         // [4] GET products
-        $this->assertCall($commands[4], "GET", "products?q=" . urlencode($product2["name"]));
+        $this->assertCall($commands[4], "GET", "products?externalId=" . urlencode($product2["sku"]));
         // [5] POST products
         $this->assertCall($commands[5], "POST", "products", array(
             "name" => $product2["name"],
             "accountId" => Mage::getStoreConfig("billy/invoicer/sales_account"),
             "vatModelId" => Mage::getStoreConfig("billy/invoicer/vat_model"),
             "productType" => "product",
-            "productNo" => $product2["id"],
-            "suppliersProductNo" => $product2["supplier_id"],
+            "productNo" => $product2["sku"],
+            "externalId" => $product2["sku"],
             "prices" => array(
                 array(
                     "currencyId" => BillysBillingInvoicerTest::$testConfig["currency"],
@@ -464,6 +473,7 @@ class BillysBillingInvoicerTest extends PHPUnit_Framework_TestCase {
             )
         ));
         // [6] POST invoices
+        unset($commands[6]["params"]["contactMessage"]);
         $this->assertCall($commands[6], "POST", "invoices", array(
             "type" => "invoice",
             "contactId" => "12345-ABCDEFGHIJKLMNOP",
@@ -518,7 +528,7 @@ class BillysBillingInvoicerTest extends PHPUnit_Framework_TestCase {
 
         $commands = getOutput();
         // [0] GET contacts
-        $this->assertCall($commands[0], "GET", "contacts?q=" . urlencode($address1["firstname"] . " " . $address1["lastname"]));
+        $this->assertCall($commands[0], "GET", "contacts?externalId=" . urlencode($address1["email"]));
         // [1] POST contacts
         $this->assertCall($commands[1], "POST", "contacts", array(
             "name" => $address1["firstname"] . " " . $address1["lastname"],
@@ -529,6 +539,7 @@ class BillysBillingInvoicerTest extends PHPUnit_Framework_TestCase {
             "state" => null,
             "phone" => $address1["telephone"],
             "fax" => null,
+            "externalId" => $address1["email"],
             "persons" => array(
                 array(
                     "name" => $address1["firstname"] . " " . $address1["lastname"],
@@ -538,15 +549,15 @@ class BillysBillingInvoicerTest extends PHPUnit_Framework_TestCase {
             )
         ));
         // [2] GET products
-        $this->assertCall($commands[2], "GET", "products?q=" . urlencode($product1["name"]));
+        $this->assertCall($commands[2], "GET", "products?externalId=" . urlencode($product1["sku"]));
         // [3] POST products
         $this->assertCall($commands[3], "POST", "products", array(
             "name" => $product1["name"],
             "accountId" => Mage::getStoreConfig("billy/invoicer/sales_account"),
             "vatModelId" => Mage::getStoreConfig("billy/invoicer/vat_model"),
             "productType" => "product",
-            "productNo" => $product1["id"],
-            "suppliersProductNo" => $product1["supplier_id"],
+            "productNo" => $product1["sku"],
+            "externalId" => $product1["sku"],
             "prices" => array(
                 array(
                     "currencyId" => BillysBillingInvoicerTest::$testConfig["currency"],
@@ -555,15 +566,15 @@ class BillysBillingInvoicerTest extends PHPUnit_Framework_TestCase {
             )
         ));
         // [4] GET products
-        $this->assertCall($commands[4], "GET", "products?q=" . urlencode($product2["name"]));
+        $this->assertCall($commands[4], "GET", "products?externalId=" . urlencode($product2["sku"]));
         // [5] POST products
         $this->assertCall($commands[5], "POST", "products", array(
             "name" => $product2["name"],
             "accountId" => Mage::getStoreConfig("billy/invoicer/sales_account"),
             "vatModelId" => Mage::getStoreConfig("billy/invoicer/vat_model"),
             "productType" => "product",
-            "productNo" => $product2["id"],
-            "suppliersProductNo" => $product2["supplier_id"],
+            "productNo" => $product2["sku"],
+            "externalId" => $product2["sku"],
             "prices" => array(
                 array(
                     "currencyId" => BillysBillingInvoicerTest::$testConfig["currency"],
@@ -572,6 +583,7 @@ class BillysBillingInvoicerTest extends PHPUnit_Framework_TestCase {
             )
         ));
         // [6] POST invoices
+        unset($commands[6]["params"]["contactMessage"]);
         $this->assertCall($commands[6], "POST", "invoices", array(
             "type" => "invoice",
             "contactId" => "12345-ABCDEFGHIJKLMNOP",
@@ -620,7 +632,7 @@ class BillysBillingInvoicerTest extends PHPUnit_Framework_TestCase {
 
         $commands = getOutput();
         // [0] GET contacts
-        $this->assertCall($commands[0], "GET", "contacts?q=" . urlencode($address1["firstname"] . " " . $address1["lastname"]));
+        $this->assertCall($commands[0], "GET", "contacts?externalId=" . urlencode($address1["email"]));
         // [1] POST contacts
         $this->assertCall($commands[1], "POST", "contacts", array(
             "name" => $address1["firstname"] . " " . $address1["lastname"],
@@ -631,6 +643,7 @@ class BillysBillingInvoicerTest extends PHPUnit_Framework_TestCase {
             "state" => null,
             "phone" => $address1["telephone"],
             "fax" => null,
+            "externalId" => $address1["email"],
             "persons" => array(
                 array(
                     "name" => $address1["firstname"] . " " . $address1["lastname"],
@@ -640,15 +653,15 @@ class BillysBillingInvoicerTest extends PHPUnit_Framework_TestCase {
             )
         ));
         // [2] GET products
-        $this->assertCall($commands[2], "GET", "products?q=" . urlencode($product1["name"]));
+        $this->assertCall($commands[2], "GET", "products?externalId=" . urlencode($product1["sku"]));
         // [3] POST products
         $this->assertCall($commands[3], "POST", "products", array(
             "name" => $product1["name"],
             "accountId" => Mage::getStoreConfig("billy/invoicer/sales_account"),
             "vatModelId" => Mage::getStoreConfig("billy/invoicer/vat_model"),
             "productType" => "product",
-            "productNo" => $product1["id"],
-            "suppliersProductNo" => $product1["supplier_id"],
+            "productNo" => $product1["sku"],
+            "externalId" => $product1["sku"],
             "prices" => array(
                 array(
                     "currencyId" => BillysBillingInvoicerTest::$testConfig["currency"],
@@ -657,6 +670,7 @@ class BillysBillingInvoicerTest extends PHPUnit_Framework_TestCase {
             )
         ));
         // [4] POST invoices
+        unset($commands[4]["params"]["contactMessage"]);
         $this->assertCall($commands[4], "POST", "invoices", array(
             "type" => "invoice",
             "contactId" => "12345-ABCDEFGHIJKLMNOP",
