@@ -104,6 +104,7 @@ class BillysBilling_Invoicer_Model_Observer {
         $invoice = array(
             "type" => "invoice",
             "contactId" => $contactId,
+            "contactMessage" => "Order ID #" . $order->getId(),
             "entryDate" => $date,
             "dueDate" => $dueDate,
             "currencyId" => Mage::app()->getStore()->getCurrentCurrencyCode(),
