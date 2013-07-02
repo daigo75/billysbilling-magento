@@ -22,7 +22,7 @@ $testConfig = array(
         array(
             "id" => 0, // Test product's ID
             "name" => "", // Test product's name
-            "supplier_id" => "", // Test product's supplier number
+            "sku" => "", // Test product's SKU
             "price" => 0, // Test product's price
             "shipping_price" => 0 // Test product's shipping price
         )
