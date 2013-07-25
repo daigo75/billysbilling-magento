@@ -93,6 +93,15 @@
                             <show_in_website>0</show_in_website>
                             <show_in_store>0</show_in_store>
                         </due_date_offset>
+                        <contact_message translate="label">
+                            <label>Contact message</label>
+                            <comment>Contact message to accompany the created invoice. Insert {order_id} for inserting the Order ID (e.g. "Order ID #{order_id}" for "Order ID #123456").</comment>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>70</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </contact_message>
                     </fields>
                 </invoicer>
             </groups>

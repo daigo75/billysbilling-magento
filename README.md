@@ -41,6 +41,9 @@ The tests relies on the ability to create/read/write a file in the tests directo
 _You should only run the tests in a development environment._ The tests automatically creates and deletes orders, which could possibly affect other parts of the shop. The tests takes care of resetting product stock levels after each test, but this might not be sufficient for a production environment.
 
 ##Version history
+###1.0.6
+* Added contact message customization
+
 ###1.0.5
 * Added contact message with order ID
 * Added customer email as external ID

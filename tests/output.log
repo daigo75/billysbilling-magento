@@ -1,0 +1,6 @@
+{"mode":"GET","address":"contacts?externalId=michael%40billysbilling.com"}
+{"mode":"POST","address":"contacts","params":{"name":"Michael Storgaard","street":"Hyskenstr\u00e6de 10, 3","zipcode":"1207","city":"K\u00f8benhavn K","countryId":"DK","state":null,"phone":"88888888","fax":null,"externalId":"michael@billysbilling.com","persons":[{"name":"Michael Storgaard","email":"michael@billysbilling.com","phone":"88888888"}]}}
+{"mode":"GET","address":"products?externalId=LX.FR206.001"}
+{"mode":"POST","address":"products","params":{"name":"Acer Ferrari 3200 Notebook Computer PC","accountId":"2903775-OZNKC50AODkk","vatModelId":"2903758-YUuJOj0Ky6yx","productType":"product","productNo":"LX.FR206.001","externalId":"LX.FR206.001","prices":[{"currencyId":"DKK","unitPrice":"1799.9900"}]}}
+{"mode":"POST","address":"invoices","params":{"type":"invoice","contactId":"12345-ABCDEFGHIJKLMNOP","contactMessage":"Ordrenummer 100000209","entryDate":"2013-07-25","dueDate":"2013-07-25","currencyId":"DKK","state":"approved","lines":[{"productId":"12345-ABCDEFGHIJKLMNOP","quantity":1,"unitPrice":"1799.9900"},{"productId":"8814621-5cgYkZFtaBcz","quantity":1,"unitPrice":"5.0000"}]}}
+{"mode":"POST","address":"payments","params":{"paidDate":"2013-07-25","accountId":"2903829-7g469Bxx8ZqL","amount":2254.99,"invoiceIds":["12345-ABCDEFGHIJKLMNOP"]}}

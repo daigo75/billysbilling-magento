@@ -10,6 +10,7 @@ class BillysBilling_Invoicer_Model_Observer {
     private $bankAccountId = "";
     private $disablePayments = false;
     private $dueDateOffset = 0;
+    private $contactMessage = "";
 
     private $client;
 
@@ -33,6 +34,7 @@ class BillysBilling_Invoicer_Model_Observer {
         $this->bankAccountId = Mage::getStoreConfig("billy/invoicer/bank_account");
         $this->disablePayments = Mage::getStoreConfig("billy/invoicer/disable_payments");
         $this->dueDateOffset = Mage::getStoreConfig("billy/invoicer/due_date_offset");
+        $this->contactMessage = Mage::getStoreConfig("billy/invoicer/contact_message");
 
         // Include Billy's PHP SDK
         if (!class_exists('Billy_Client', false)) {
@@ -104,7 +106,7 @@ class BillysBilling_Invoicer_Model_Observer {
         $invoice = array(
             "type" => "invoice",
             "contactId" => $contactId,
-            "contactMessage" => "Order ID #" . $order->getId(),
+            "contactMessage" => str_replace("{order_id}", $order->getIncrementId(), $this->contactMessage),
             "entryDate" => $date,
             "dueDate" => $dueDate,
             "currencyId" => Mage::app()->getStore()->getCurrentCurrencyCode(),

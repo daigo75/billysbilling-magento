@@ -47,7 +47,7 @@ class BillysBillingInvoicerTest extends PHPUnit_Framework_TestCase {
         Mage::getModel("sales/order")->loadByIncrementId($this->orderId)->delete();
 
         // Remove output log
-        unlink(TEST_OUTPUT_LOG_FILE);
+//        unlink(TEST_OUTPUT_LOG_FILE);
     }
 
     public function testSimpleOrder() {
