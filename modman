@@ -1,0 +1,7 @@
+# Code
+app/code/community/BillysBilling/Invoicer/   app/code/community/BillysBilling/Invoicer/
+app/etc/modules/*                            app/etc/modules
+
+# Design - Frontend
+#app/design/frontend/base/default/layout/*    app/design/frontend/base/default/layout
+#app/design/frontend/base/default/template/*  app/design/frontend/base/default/template
